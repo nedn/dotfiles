@@ -43,7 +43,11 @@ set nocompatible
 set showcmd
 
 " Folding Stuffs
-set foldmethod=marker
+set foldmethod=manual
+noremap <F9> <C-O>za
+nnoremap <F9> za
+onoremap <F9> <C-C>za
+vnoremap <F9> zf
 
 " Needed for Syntax Highlighting and stuff
 filetype on
@@ -290,4 +294,3 @@ let g:Tex_ViewRule_pdf = "kpdf"
 filetype plugin indent on
 " For autocompletion in python
 let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
-syntax on
