@@ -1,0 +1,1 @@
+bexec-v0.5.vba: call delete('/home/xy/.vim/plugin/bexec.vim')|call delete('/home/xy/.vim/doc/bexec.txt')

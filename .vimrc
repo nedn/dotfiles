@@ -44,7 +44,7 @@ set showcmd
 
 " Folding Stuffs
 set foldmethod=indent
-
+set foldmethod=marker
 " Needed for Syntax Highlighting and stuff
 filetype on
 filetype plugin on
@@ -283,6 +283,18 @@ nnoremap <leader>par :%s/^>$//<CR>
 "let Tlist_Inc_Winwidth = 0
 "}}}
 
+"{{{MiniBufExplorer configuration
+let g:miniBufExplMapWindowNavVim = 1
+let g:miniBufExplMapWindowNavArrows = 1
+let g:miniBufExplMapCTabSwitchBufs = 1
+let g:miniBufExplModSelTarget = 1
+"}}}
+
+"{{{Bexec configuration
+autocmd BufNewFile,BufRead *.py let bexec_interpreter = '/usr/bin/python3'
+let bexec_outputmode = "append"
+"}}}
+
 let g:rct_completion_use_fri = 1
 "let g:Tex_DefaultTargetFormat = "pdf"
 let g:Tex_ViewRule_pdf = "kpdf"
@@ -290,3 +302,5 @@ let g:Tex_ViewRule_pdf = "kpdf"
 filetype plugin indent on
 " For autocompletion in python
 let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
+
+
