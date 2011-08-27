@@ -43,11 +43,7 @@ set nocompatible
 set showcmd
 
 " Folding Stuffs
-set foldmethod=manual
-noremap <F9> <C-O>za
-nnoremap <F9> za
-onoremap <F9> <C-C>za
-vnoremap <F9> zf
+set foldmethod=indent
 
 " Needed for Syntax Highlighting and stuff
 filetype on
@@ -226,7 +222,7 @@ nnoremap <silent> <C-t> :tabnew<CR>
 nnoremap <silent> <F8> :execute RotateColorTheme()<CR>
 
 " DOS is for fools.
-nnoremap <silent> <F9> :%s/$//g<CR>:%s// /g<CR>
+";nnoremap <silent> <F9> :%s/$//g<CR>:%s// /g<CR>
 
 " Paste Mode!  Dang! <F10>
 nnoremap <silent> <F10> :call Paste_on_off()<CR>
@@ -279,12 +275,12 @@ nnoremap <leader>par :%s/^>$//<CR>
 "}}}
 
 "{{{Taglist configuration
-let Tlist_Auto_Open = 1
-let Tlist_Use_Right_Window = 1
-let Tlist_Enable_Fold_Column = 0
-let Tlist_Exit_OnlyWindow = 1
-let Tlist_Use_SingleClick = 1
-let Tlist_Inc_Winwidth = 0
+"let Tlist_Auto_Open = 1
+"let Tlist_Use_Right_Window = 1
+"let Tlist_Enable_Fold_Column = 0
+"let Tlist_Exit_OnlyWindow = 1
+"let Tlist_Use_SingleClick = 1
+"let Tlist_Inc_Winwidth = 0
 "}}}
 
 let g:rct_completion_use_fri = 1
