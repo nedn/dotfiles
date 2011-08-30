@@ -45,6 +45,7 @@ set showcmd
 " Folding Stuffs
 set foldmethod=indent
 set foldmethod=marker
+
 " Needed for Syntax Highlighting and stuff
 filetype on
 filetype plugin on
