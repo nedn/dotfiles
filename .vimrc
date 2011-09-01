@@ -199,10 +199,10 @@ endfunction
 map <Leader>w :call Browser ()<CR>
 
 " Open the Project Plugin <F2>
-nnoremap <silent> <F2> :Project<CR>
+"nnoremap <silent> <F2> :Project<CR>
 
 " Open the Project Plugin
-nnoremap <silent> <Leader>pal  :Project .vimproject<CR>
+"nnoremap <silent> <Leader>pal  :Project .vimproject<CR>
 
 " TODO Mode
 nnoremap <silent> <Leader>todo :execute TodoListMode()<CR>
@@ -211,16 +211,28 @@ nnoremap <silent> <Leader>todo :execute TodoListMode()<CR>
 nnoremap <silent> <F3> :Tlist<CR>
 
 " Next Tab
-nnoremap <silent> <C-Right> :tabnext<CR>
+" nnoremap <silent> <C-Right> :tabnext<CR>
 
 " Previous Tab
-nnoremap <silent> <C-Left> :tabprevious<CR>
+"nnoremap <silent> <C-Left> :tabprevious<CR>
 
 " New Tab
-nnoremap <silent> <C-t> :tabnew<CR>
+" nnoremap <silent> <C-t> :tabnew<CR>
 
 " Rotate Color Scheme <F8>
 nnoremap <silent> <F8> :execute RotateColorTheme()<CR>
+
+" Moving between windows with Control + arrowkeys
+noremap <C-Down>  <C-W>j
+noremap <C-Up>    <C-W>k
+noremap <C-Left>  <C-W>h
+noremap <C-Right> <C-W>l
+
+" Moving between windows with Control + h/j/k/l
+noremap <C-J> <C-W>j
+noremap <C-K> <C-W>k
+noremap <C-H> <C-W>h
+noremap <C-L> <C-W>l
 
 " DOS is for fools.
 ";nnoremap <silent> <F9> :%s/$//g<CR>:%s// /g<CR>
@@ -276,19 +288,18 @@ nnoremap <leader>par :%s/^>$//<CR>
 "}}}
 
 "{{{Taglist configuration
-"let Tlist_Auto_Open = 1
-"let Tlist_Use_Right_Window = 1
-"let Tlist_Enable_Fold_Column = 0
-"let Tlist_Exit_OnlyWindow = 1
-"let Tlist_Use_SingleClick = 1
-"let Tlist_Inc_Winwidth = 0
+let Tlist_Use_Right_Window = 1
+let Tlist_Enable_Fold_Column = 0
+let Tlist_Exit_OnlyWindow = 1
+let Tlist_Use_SingleClick = 1
+let Tlist_Inc_Winwidth = 0
 "}}}
 
 "{{{MiniBufExplorer configuration
-let g:miniBufExplMapWindowNavVim = 1
-let g:miniBufExplMapWindowNavArrows = 1
-let g:miniBufExplMapCTabSwitchBufs = 1
-let g:miniBufExplModSelTarget = 1
+"let g:miniBufExplMapWindowNavVim = 1
+"let g:miniBufExplMapWindowNavArrows = 1
+"let g:miniBufExplMapCTabSwitchBufs = 1
+"let g:miniBufExplModSelTarget = 1
 "}}}
 
 "{{{Bexec configuration
@@ -301,7 +312,8 @@ let g:rct_completion_use_fri = 1
 let g:Tex_ViewRule_pdf = "kpdf"
 
 filetype plugin indent on
-" For autocompletion in python
+
+"For autocompletion in python
 let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
 
 
