@@ -43,12 +43,13 @@ set nocompatible
 set showcmd
 
 " Folding Stuffs
-set foldmethod=indent
-set foldmethod=marker
+set foldmethod=syntax
+"set foldmethod=maker
 
 " Needed for Syntax Highlighting and stuff
 filetype on
 filetype plugin on
+filetype plugin indent on
 syntax enable
 set grepprg=grep\ -nH\ $*
 
@@ -113,6 +114,9 @@ highlight MatchParen ctermbg=4
 " }}}
 
 "{{{Look and Feel
+
+"I always work on dark terminals
+set background=dark
 
 " Favorite Color Scheme
 if has("gui_running")
@@ -210,14 +214,17 @@ nnoremap <silent> <Leader>todo :execute TodoListMode()<CR>
 " Open the TagList Plugin <F3>
 nnoremap <silent> <F3> :Tlist<CR>
 
+" Open the NERDtree Plugin <F4>
+nnoremap <silent> <F4> :NERDTreeToggle<CR>
+
 " Next Tab
-" nnoremap <silent> <C-Right> :tabnext<CR>
+nnoremap <silent> <C-n> :tabnext<CR>
 
 " Previous Tab
-"nnoremap <silent> <C-Left> :tabprevious<CR>
+nnoremap <silent> <C-p> :tabprevious<CR>
 
 " New Tab
-" nnoremap <silent> <C-t> :tabnew<CR>
+nnoremap <silent> <C-t> :tabnew<CR>
 
 " Rotate Color Scheme <F8>
 nnoremap <silent> <F8> :execute RotateColorTheme()<CR>
@@ -307,11 +314,13 @@ autocmd BufNewFile,BufRead *.py let bexec_interpreter = '/usr/bin/python3'
 let bexec_outputmode = "append"
 "}}}
 
+"{{{NERDTree configuration
+let NERDChristmasTree=1
+"}}}
+
 let g:rct_completion_use_fri = 1
 "let g:Tex_DefaultTargetFormat = "pdf"
 let g:Tex_ViewRule_pdf = "kpdf"
-
-filetype plugin indent on
 
 "For autocompletion in python
 let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
