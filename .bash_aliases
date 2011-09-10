@@ -1,0 +1,5 @@
+alias cp='cp -i'
+alias l.='ls -d .*'
+alias lsd='ls -la | grep "^d"'
+alias mv='mv -i'
+alias rm='rm -i'
