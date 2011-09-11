@@ -101,3 +101,36 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
+
+# [Nghia's configuration]
+
+# set CDPATH for easier nagivation
+CDPATH=.:..:~:~/Desktop
+
+# prevent accidental file overwriting
+set -o noclobber
+
+# prevent accidental logging out
+set -o ignoreeof
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

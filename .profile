@@ -25,15 +25,3 @@ fi
 PATH=/home/xy/texlive/2011/bin/i386-linux:$PATH; export PATH
 MANPATH=/home/xy/texlive/2011/texmf/doc/man:$MANPATH; export MANPATH
 INFOPATH=/home/xy/texlive/2011/texmf/doc/info:$INFOPATH; export INFOPATH
-
-# [Nghia's configuration]
-
-# set CDPATH for easier nagivation
-CDPATH=.:..:~:~/Desktop
-
-# prevent accidental file overwriting
-set -o noclobber
-
-# prevent accidental logging out
-set -o ignoreeof
-
