@@ -1,0 +1,48 @@
+guake
+vim
+git
+python3
+PIL (Python Imaging Library)
+Gnome themes
+Gnome themes extra
+Pidgin
+pidgin-plugin-pack
+VLC
+codecs
+Gimp
+Rythmbox
+Murrines engine
+shiki-color brave
+gdm-themes
+deskbar applet
+p7zip-full
+sun-jdk
+sun-jre
+jdownloader
+fire-roller
+xchat
+
+modify in /usr/share/desktop-base/grub_background.sh :
+change "../usr/.../images/desktop-base/desktop-grub.png" to ".../images/grub/Apollo_..."
+update-grub
+
+eclipse
+freemat
+
+perl-tk
+texlive
+texmaker
+
+terminator
+
+p7zip-rar
+unrar
+
+g++
+essenstial-package
+chmsee
+
+gbrainy
+
+http://wiki.debian.org/NvidiaGraphicsDrivers
+nvidia-settings
