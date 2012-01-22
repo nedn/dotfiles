@@ -44,6 +44,7 @@ set showcmd
 
 " Folding Stuffs
 set foldmethod=syntax
+set foldnestmax=1
 "set foldmethod=maker
 
 " Needed for Syntax Highlighting and stuff
@@ -321,8 +322,3 @@ let NERDChristmasTree=1
 let g:rct_completion_use_fri = 1
 "let g:Tex_DefaultTargetFormat = "pdf"
 let g:Tex_ViewRule_pdf = "kpdf"
-
-"For autocompletion in python
-let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
-
-
