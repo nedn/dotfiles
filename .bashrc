@@ -2,6 +2,20 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# Define some colors first:
+red='\e[0;31m'
+RED='\e[1;31m'
+blue='\e[0;34m'
+BLUE='\e[1;34m'
+cyan='\e[0;36m'
+CYAN='\e[1;36m'
+NC='\e[0m'              # No Color
+# --> Nice. Has the same effect as using "ansi.sys" in DOS.
+
+# Looks best on a terminal with black background.....
+echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}\
+${NC} - ${BLUE}`uname -a`"
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -50,7 +64,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    PS1='\n\e[0;34m\d\e[m - \e[0;36m\t\e[m\n${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
@@ -112,25 +126,3 @@ set -o noclobber
 
 # prevent accidental logging out
 set -o ignoreeof
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
