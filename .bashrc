@@ -13,7 +13,10 @@ NC='\e[0m'              # No Color
 # --> Nice. Has the same effect as using "ansi.sys" in DOS.
 
 # Looks best on a terminal with black background.....
-echo -e "${CYAN}This is BASH ${BASH_VERSION%.*}\n${RED}`fortune`"
+echo -e "${CYAN}This is BASH ${BASH_VERSION%.*}"
+if [ -f /usr/games/fortune ]; then
+    echo -e "${RED}`fortune`"
+fi
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
