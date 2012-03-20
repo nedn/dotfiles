@@ -128,3 +128,6 @@ set -o noclobber
 
 # prevent accidental logging out
 set -o ignoreeof
+
+# python tab complete
+export PYTHONSTARTUP=~/.pythonstartup

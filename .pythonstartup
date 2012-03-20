@@ -1,0 +1,13 @@
+import readline, rlcompleter
+
+# Include this next line to enable command completion
+readline.parse_and_bind("tab: complete")
+
+# Include the following lines to enable peristent command history
+# (saved to ~/.python_history)
+import os, atexit
+readline_history_file = os.path.join(os.path.expanduser('~'), '.python_history')
+try: readline.read_history_file(readline_history_file)
+except IOError: pass
+readline.set_history_length(3000)
+atexit.register(readline.write_history_file, readline_history_file)
