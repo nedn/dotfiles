@@ -44,7 +44,6 @@ set showcmd
 
 " Folding Stuffs
 set foldmethod=syntax
-set foldnestmax=1
 "set foldmethod=maker
 
 " Needed for Syntax Highlighting and stuff
@@ -62,8 +61,8 @@ set expandtab
 set smarttab
 
 " Who wants an 8 character tab?  Not me!
-set shiftwidth=4
-set softtabstop=4
+set shiftwidth=2
+set softtabstop=2
 
 " Use english for spellchecking, but don't spellcheck by default
 if version >= 700
@@ -291,8 +290,6 @@ nnoremap : ;
 " Fix email paragraphs
 nnoremap <leader>par :%s/^>$//<CR>
 
-"ly$O#{{{ "lpjjj_%A#}}}jjzajj
-
 "}}}
 
 "{{{Taglist configuration
@@ -322,3 +319,8 @@ let NERDChristmasTree=1
 let g:rct_completion_use_fri = 1
 "let g:Tex_DefaultTargetFormat = "pdf"
 let g:Tex_ViewRule_pdf = "kpdf"
+
+"For autocompletion in python
+let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
+
+
