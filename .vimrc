@@ -43,7 +43,7 @@ set nocompatible
 set showcmd
 
 " Folding Stuffs
-set foldmethod=syntax
+"set foldmethod=syntax
 "set foldmethod=maker
 
 " Needed for Syntax Highlighting and stuff
@@ -61,8 +61,16 @@ set expandtab
 set smarttab
 
 " Who wants an 8 character tab?  Not me!
-set shiftwidth=2
-set softtabstop=2
+set shiftwidth=4
+set softtabstop=4
+
+" Column limit is 80
+setlocal textwidth=100
+if exists('+colorcolumn')
+  set colorcolumn=100
+else
+  au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
+endif
 
 " Use english for spellchecking, but don't spellcheck by default
 if version >= 700
@@ -322,5 +330,3 @@ let g:Tex_ViewRule_pdf = "kpdf"
 
 "For autocompletion in python
 let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
-
-
