@@ -220,7 +220,7 @@ map <Leader>w :call Browser ()<CR>
 nnoremap <silent> <Leader>todo :execute TodoListMode()<CR>
 
 " Open the TagList Plugin <F3>
-nnoremap <silent> <F3> :Tlist<CR>
+"nnoremap <silent> <F3> :Tlist<CR>
 
 " Open the NERDtree Plugin <F4>
 nnoremap <silent> <F4> :NERDTreeToggle<CR>
@@ -301,11 +301,11 @@ nnoremap <leader>par :%s/^>$//<CR>
 "}}}
 
 "{{{Taglist configuration
-let Tlist_Use_Right_Window = 1
-let Tlist_Enable_Fold_Column = 0
-let Tlist_Exit_OnlyWindow = 1
-let Tlist_Use_SingleClick = 1
-let Tlist_Inc_Winwidth = 0
+"let Tlist_Use_Right_Window = 1
+"let Tlist_Enable_Fold_Column = 0
+"let Tlist_Exit_OnlyWindow = 1
+"let Tlist_Use_SingleClick = 1
+"let Tlist_Inc_Winwidth = 0
 "}}}
 
 "{{{MiniBufExplorer configuration
