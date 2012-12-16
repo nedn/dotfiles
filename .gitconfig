@@ -1,0 +1,15 @@
+[user]
+    name = Nghia Nguyen
+    email = NghiaNguyenBH@gmail.com\n
+[alias]
+    st = status
+    ci = commit
+    br = branch -a
+    co = checkout
+    d = diff
+    lg = log -p
+[color]
+  status = auto
+  branch = auto
+  ui = auto
+  diff = auto
