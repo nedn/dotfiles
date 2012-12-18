@@ -6,7 +6,7 @@
     ci = commit
     br = branch -a
     co = checkout
-    d = diff
+    df = diff
     lg = log -p
 [color]
   status = auto
