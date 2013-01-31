@@ -131,3 +131,6 @@ set -o ignoreeof
 
 # python tab complete
 export PYTHONSTARTUP=~/.pythonstartup
+
+# add z - a better file navigator
+. ~/dotfiles/z/z.sh
