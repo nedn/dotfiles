@@ -13,3 +13,5 @@
   branch = auto
   ui = auto
   diff = auto
+[core]
+	editor = vim
