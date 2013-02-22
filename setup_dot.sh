@@ -1,6 +1,7 @@
 # bash config
 cp .bashrc ~/
 cp .bash_aliases ~/
+cp .bash_functions ~/
 source ~/.bashrc
 # vim config
 cp .vimrc ~/
