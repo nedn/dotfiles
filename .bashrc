@@ -93,11 +93,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -134,3 +129,13 @@ export PYTHONSTARTUP=~/.pythonstartup
 
 # add z - a better file navigator
 . ~/dotfiles/z/z.sh
+
+# CS 162 setup
+ARCHDIR=~/CS162/mips-x86.linux-xgcc
+PATH=~/CS162/mips-x86.linux-xgcc:~/CS162/nachos/bin:~/CS294-1/BIDMat:$PATH
+export LD_LIBRARY_PATH=~/CS294-1/BIDMat/lib/linux64
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+
+### Added by the Heroku Toolbelt
+export PATH="/usr/local/heroku/bin:$PATH"
