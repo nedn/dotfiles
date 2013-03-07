@@ -16,7 +16,7 @@ elseif exists("b:current_syntax")
 endif
 
 syn keyword matlabStatement		return function
-syn keyword matlabConditional		switch case else elseif end if otherwise break continue endfor endfunction
+syn keyword matlabConditional		switch case else elseif end if otherwise break continue endfor endfunction endif
 syn keyword matlabRepeat		do for while
 syn keyword matlabStorageClass		classdef methods properties events persistent global
 syn keyword matlabExceptions		try catch rethrow throw
@@ -57,6 +57,7 @@ syn match matlabSemicolon		";"
 syn match matlabComment			"%.*$"	contains=matlabTodo,matlabTab
 syn match octaveComment			"#.*$"	contains=matlabTodo,matlabTab
 syn region matlabBlockComment        start=+%{+    end=+%}+ contains=matlabBlockComment
+syn region octaveBlockComment        start=+#{+    end=+#}+ contains=octaveBlockComment
 
 
 " trigonometric
@@ -337,6 +338,7 @@ if version >= 508 || !exists("did_matlab_syntax_inits")
   HiLink matlabComment			Comment
   HiLink matlabBlockComment		Comment
   HiLink octaveComment			Comment
+  HiLink octaveBlockComment		Comment
   HiLink matlabImport			Include
   HiLink matlabBoolean			Boolean
   HiLink matlabStorageClass		StorageClass
