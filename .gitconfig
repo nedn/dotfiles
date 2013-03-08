@@ -16,4 +16,4 @@
 [core]
 	editor = vim
 [diff]
-	external = ~/dotfiles/diff.py
+	external = ~/dotfiles/diff.sh
