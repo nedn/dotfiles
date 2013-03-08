@@ -15,3 +15,5 @@
   diff = auto
 [core]
 	editor = vim
+[diff]
+	external = ~/dotfiles/diff.py
