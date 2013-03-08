@@ -130,6 +130,9 @@ export PYTHONSTARTUP=~/.pythonstartup
 # add z - a better file navigator
 . ~/dotfiles/z/z.sh
 
+# a collection of bash_functions
+. ~/.bash_functions
+
 # CS 162 setup
 ARCHDIR=~/CS162/mips-x86.linux-xgcc
 PATH=~/CS162/mips-x86.linux-xgcc:~/CS162/nachos/bin:~/CS294-1/BIDMat:$PATH
