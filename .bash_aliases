@@ -8,3 +8,8 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+#update time
+alias updateTime='sudo hwclock --systohc'
+
+# go
+alias gofmt='gofmt -w -tabs=false -tabwidth=4'
