@@ -53,6 +53,10 @@ filetype plugin indent on
 syntax enable
 set grepprg=grep\ -nH\ $*
 
+" Line highlighting
+set cursorline
+hi CursorLine ctermbg=8 ctermfg=15
+
 " Who doesn't like autoindent?
 set autoindent smartindent
 
@@ -330,3 +334,6 @@ let g:Tex_ViewRule_pdf = "kpdf"
 
 "For autocompletion in python
 let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
+
+"Go
+autocmd FileType go compiler go
