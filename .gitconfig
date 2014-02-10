@@ -20,3 +20,5 @@
   external = ~/dotfiles/diff.sh
 [merge]
   tool = meld
+[branch]
+	autosetuprebase = always
