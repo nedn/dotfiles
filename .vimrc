@@ -53,6 +53,10 @@ filetype plugin indent on
 syntax enable
 set grepprg=grep\ -nH\ $*
 
+" Line highlighting
+set cursorline
+hi CursorLine ctermbg=8 ctermfg=15
+
 " Who doesn't like autoindent?
 set autoindent smartindent
 
@@ -328,9 +332,6 @@ let g:rct_completion_use_fri = 1
 "let g:Tex_DefaultTargetFormat = "pdf"
 let g:Tex_ViewRule_pdf = "kpdf"
 
-"For autocompletion in python
-let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
-
 " Change word under cursor
 :nnoremap <Leader>r :%s/\<<C-r><C-w>\>//g<Left><Left>
 
@@ -373,3 +374,11 @@ endfunction
 
 " Start the find and replace command across the entire file
 vmap <Leader>r :<Del><Del><Del><Del><Del>%s/<c-r>=GetVisual()<cr>//g<Left><Left>
+
+"Go
+autocmd FileType go compiler go
+
+"For autocompletion in python
+let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
+
+
