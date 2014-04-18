@@ -2,6 +2,10 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+set -o nounset
+set -o errexit
+set -o pipefail
+
 # Define some colors first:
 red='\e[0;31m'
 RED='\e[1;31m'
@@ -13,7 +17,7 @@ NC='\e[0m'              # No Color
 # --> Nice. Has the same effect as using "ansi.sys" in DOS.
 
 # Looks best on a terminal with black background.....
-echo -e "${CYAN}This is BASH ${BASH_VERSION%.*}"
+echo -e "This is BASH ${BASH_VERSION%.*}"
 if [ -f /usr/games/fortune ]; then
     echo -e "${RED}`fortune`"
 fi
@@ -124,21 +128,13 @@ set -o noclobber
 # prevent accidental logging out
 set -o ignoreeof
 
-# python tab complete
-export PYTHONSTARTUP=~/.pythonstartup
-
 # add z - a better file navigator
 . ~/dotfiles/z/z.sh
 
 # a collection of bash_functions
 . ~/.bash_functions
 
-# CS 162 setup
-ARCHDIR=~/CS162/mips-x86.linux-xgcc
-PATH=~/CS162/mips-x86.linux-xgcc:~/CS162/nachos/bin:~/CS294-1/BIDMat:$PATH
-export LD_LIBRARY_PATH=~/CS294-1/BIDMat/lib/linux64
-
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 
-### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
+# for DjangoTutorial project
+source ~/web-projects/DjangoTutorial/env/bin/activate
