@@ -2,10 +2,6 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
-set -o nounset
-set -o errexit
-set -o pipefail
-
 # Define some colors first:
 red='\e[0;31m'
 RED='\e[1;31m'
