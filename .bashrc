@@ -129,8 +129,3 @@ set -o ignoreeof
 
 # a collection of bash_functions
 . ~/.bash_functions
-
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-
-# for DjangoTutorial project
-source ~/web-projects/DjangoTutorial/env/bin/activate
