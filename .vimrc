@@ -45,6 +45,7 @@ set showcmd
 " Folding Stuffs
 "set foldmethod=syntax
 "set foldmethod=maker
+set nofoldenable
 
 " Needed for Syntax Highlighting and stuff
 filetype on
@@ -52,10 +53,6 @@ filetype plugin on
 filetype plugin indent on
 syntax enable
 set grepprg=grep\ -nH\ $*
-
-" Line highlighting
-set cursorline
-hi CursorLine ctermbg=8 ctermfg=15
 
 " Who doesn't like autoindent?
 set autoindent smartindent
@@ -65,13 +62,13 @@ set expandtab
 set smarttab
 
 " Who wants an 8 character tab?  Not me!
-set shiftwidth=4
-set softtabstop=4
+set shiftwidth=2
+set softtabstop=2
 
 " Column limit is 80
-setlocal textwidth=100
+setlocal textwidth=80
 if exists('+colorcolumn')
-  set colorcolumn=100
+  set colorcolumn=80
 else
   au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
 endif
@@ -332,6 +329,9 @@ let g:rct_completion_use_fri = 1
 "let g:Tex_DefaultTargetFormat = "pdf"
 let g:Tex_ViewRule_pdf = "kpdf"
 
+"For autocompletion in python
+let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
+
 " Change word under cursor
 :nnoremap <Leader>r :%s/\<<C-r><C-w>\>//g<Left><Left>
 
@@ -375,10 +375,4 @@ endfunction
 " Start the find and replace command across the entire file
 vmap <Leader>r :<Del><Del><Del><Del><Del>%s/<c-r>=GetVisual()<cr>//g<Left><Left>
 
-"Go
-autocmd FileType go compiler go
-
-"For autocompletion in python
-let g:pydiction_location = '~/.vim/after/ftplugin/pydiction/complete-dict'
-
-
+source ~/quickopen/plugin/quickopen.vim
