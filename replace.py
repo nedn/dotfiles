@@ -13,7 +13,9 @@ def FindAndReplace(root_dir, old_string, new_string):
   root_dir = os.path.abspath(root_dir)
   for root, _, files in os.walk(root_dir):
     for f in files:
-      file_path = os.path.join(root, f)
+      file_path = os.path.abspath(os.path.join(root, f))
+      if file_path == os.path.abspath(__file__):
+        continue
       try:
         Replace(file_path, old_string, new_string)
       except Exception as e:
