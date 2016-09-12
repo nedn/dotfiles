@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import argparse
+import sys
+import json
+
+
+def BeautifyJson(filepath):
+  with open(filepath, 'r') as f:
+    data = json.load(f)
+  with open(filepath, 'w') as f:
+    json.dump(data, f, indent=2, sort_keys=True, separators=(',', ': '))
+
+
+def Main(args):
+  parser = argparse.ArgumentParser('Beautify json')
+  parser.add_argument('filepath')
+  options = parser.parse_args(args)
+  BeautifyJson(options.filepath)
+
+
+if __name__ == '__main__':
+  Main(sys.argv[1:])
