@@ -16,8 +16,6 @@
   diff = auto
 [core]
   editor = vim
-[diff]
-  external = ~/dotfiles/diff.sh
 [merge]
   tool = meld
 [branch]

@@ -13,4 +13,9 @@ cp -r .vim ~/
 cp .pythonstartup ~/
 # git
 cp .gitconfig ~/
-cp -r .git ~/
+
+# install quickopen
+cd ~/
+git clone https://github.com/natduca/quickopen
+cd quickopen
+git submodule update --init --recursive
