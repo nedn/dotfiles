@@ -32,7 +32,7 @@ def main(args):
     for file_name in files:
       if not IsValidTextFile(file_name):
         continue
-      filepath = os.path.join(root, files)
+      filepath = os.path.join(root, file_name)
       lines = []
       with open(filepath, 'r') as f:
         for l in f:
