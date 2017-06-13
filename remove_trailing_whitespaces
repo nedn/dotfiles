@@ -28,7 +28,7 @@ def main(args):
     print '%s does not exist' % path
     return 1
 
-  for root, subdirs, files in os.walk(rootdir):
+  for root, subdirs, files in os.walk(path):
     for file_name in files:
       if not IsValidTextFile(file_name):
         continue
@@ -40,8 +40,8 @@ def main(args):
       formatted_data = '\n'.join(lines)
       with open(filepath, 'w') as f:
         f.write(formatted_data)
-
+  return 0
 
 
 if __name__ == '__main__':
-  return main(sys.argv[1:])
+  sys.exit(main(sys.argv[1:]))
