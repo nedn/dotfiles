@@ -6,6 +6,9 @@ autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
 " Remove any trailing whitespace that is in the file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
+" Replacing
+autocmd BufRead,BufWrite * if ! &bin | silent! retab | endif
+
 " Restore cursor position to where it was before
 augroup JumpCursorOnEdit
    au!
@@ -62,6 +65,8 @@ set expandtab
 set smarttab
 
 " Who wants an 8 character tab?  Not me!
+set tabstop=2
+set softtabstop=2
 set shiftwidth=2
 set softtabstop=2
 
@@ -277,9 +282,6 @@ nnoremap <silent> <End> a <Esc>r
 nnoremap <silent> zj o<Esc>
 nnoremap <silent> zk O<Esc>
 
-" Space will toggle folds!
-nnoremap <space> za
-
 " Search mappings: These will make it so that going to the next one in a
 " search will center on the line it's found in.
 map N Nzz
@@ -376,3 +378,5 @@ endfunction
 vmap <Leader>r :<Del><Del><Del><Del><Del>%s/<c-r>=GetVisual()<cr>//g<Left><Left>
 
 source ~/quickopen/plugin/quickopen.vim
+
+autocmd FileType python setlocal shiftwidth=2 tabstop=2
