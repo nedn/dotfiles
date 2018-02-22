@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+import argparse
+import os
+import sys
+
+_TEXT_FILE_EXTENSIONS = {
+  '.cc',
+  '.css',
+  '.cpp',
+  '.html'
+  '.py',
+  '.js',
+}
+
+
+def IsValidTextFile(file_name):
+  _, ext = os.path.splitext(file_name)
+  return ext in _TEXT_FILE_EXTENSIONS
+
+
+def main(args):
+  parser = argparse.ArgumentParser('Remove trailing white spaces')
+  parser.add_argument('path')
+
+  options = parser.parse_args(args)
+  path = options.path
+  if not os.path.exists(path):
+    print '%s does not exist' % path
+    return 1
+
+  for root, subdirs, files in os.walk(path):
+    for file_name in files:
+      if not IsValidTextFile(file_name):
+        continue
+      filepath = os.path.join(root, file_name)
+      lines = []
+      with open(filepath, 'r') as f:
+        for l in f:
+          lines.append(l.rstrip())
+      formatted_data = '\n'.join(lines)
+      with open(filepath, 'w') as f:
+        f.write(formatted_data)
+  return 0
+
+
+if __name__ == '__main__':
+  sys.exit(main(sys.argv[1:]))
