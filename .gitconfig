@@ -9,6 +9,7 @@
   df = diff
   lg = log -p
   tree = log --graph --decorate --pretty=oneline --abbrev-commit
+  sticky = config credential.helper 'cache --timeout=10800'
 [color]
   status = auto
   branch = auto
@@ -19,4 +20,4 @@
 [merge]
   tool = meld
 [branch]
-	autosetuprebase = always
+  autosetuprebase = always
