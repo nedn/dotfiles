@@ -19,3 +19,8 @@ cd ~/
 git clone https://github.com/natduca/quickopen
 cd quickopen
 git submodule update --init --recursive
+
+kitty_config_dir='~/.config/kitty'
+if [ -d "$kitty_config_dir" ]; then
+  cp kitty.conf $kitty_config_dir
+fi
