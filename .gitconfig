@@ -10,6 +10,7 @@
   lg = log -p
   tree = log --graph --decorate --pretty=oneline --abbrev-commit
   sticky = config credential.helper 'cache --timeout=10800'
+  sq = !git reset --soft $(git rev-list --reverse origin/main..HEAD | head -1) && git commit --amend
 [color]
   status = auto
   branch = auto
