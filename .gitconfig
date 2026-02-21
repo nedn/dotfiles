@@ -18,7 +18,13 @@
   diff = auto
 [core]
   editor = vim
+	pager = delta
 [merge]
   tool = meld
+	conflictStyle = zdiff3
 [branch]
   autosetuprebase = always
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
