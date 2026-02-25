@@ -5,7 +5,6 @@ set -euo pipefail
 DEFAULT_BRANCH="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')"
 
 if [[ -z "$DEFAULT_BRANCH" ]]; then
-  # refs/remotes/origin/HEAD not set — fetch it from the remote
   git remote set-head origin --auto
   DEFAULT_BRANCH="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's|refs/remotes/origin/||')"
 fi
@@ -32,11 +31,23 @@ fi
 
 echo "Rewriting unpushed commits to: $USER_NAME <$USER_EMAIL>"
 
-git filter-branch -f --env-filter "
-  GIT_AUTHOR_NAME='$USER_NAME'
-  GIT_AUTHOR_EMAIL='$USER_EMAIL'
-  GIT_COMMITTER_NAME='$USER_NAME'
-  GIT_COMMITTER_EMAIL='$USER_EMAIL'
-" "$REMOTE_REF"..HEAD
+# Stash any uncommitted changes so rebase can proceed cleanly
+STASHED=false
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  git stash push -m "git_config.sh temporary stash"
+  STASHED=true
+fi
+
+# Restore stash on exit (whether success or failure)
+restore_stash() {
+  if [[ "$STASHED" == true ]]; then
+    echo "Restoring stashed changes..."
+    git stash pop
+  fi
+}
+trap restore_stash EXIT
+
+git rebase "$REMOTE_REF" --exec \
+  "git commit --amend --reset-author --no-edit"
 
 echo "Done."
