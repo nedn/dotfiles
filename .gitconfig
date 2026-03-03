@@ -1,6 +1,6 @@
 [user]
-  name = Nghia Nguyen
-  email = NghiaNguyenBH@gmail.com\n
+  name = Ned
+  email = 911877+nedn@users.noreply.github.com
 [alias]
   st = status
   ci = commit
@@ -18,13 +18,13 @@
   diff = auto
 [core]
   editor = vim
-	pager = delta
+  pager = delta
 [merge]
   tool = meld
-	conflictStyle = zdiff3
+  conflictStyle = zdiff3
 [branch]
   autosetuprebase = always
 [interactive]
-	diffFilter = delta --color-only
+  diffFilter = delta --color-only
 [delta]
-	navigate = true
+  navigate = true
