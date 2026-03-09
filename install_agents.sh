@@ -59,7 +59,6 @@ info "Node $(node --version) / npm $(npm --version) active"
 # ── 3. Install global AI CLI tools ───────────────────────────
 section "Installing Claude Code"
 
-# Native installer (recommended — replaces deprecated npm method)
 curl -fsSL https://claude.ai/install.sh | bash
 
 # Ensure the binary is on PATH (installer places it in ~/.local/bin)
