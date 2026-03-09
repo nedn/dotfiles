@@ -58,7 +58,16 @@ info "Node $(node --version) / npm $(npm --version) active"
 
 # ── 3. Install global AI CLI tools ───────────────────────────
 section "Installing Claude Code"
-npm install -g @anthropic-ai/claude-code
+
+# Native installer (recommended — replaces deprecated npm method)
+curl -fsSL https://claude.ai/install.sh | bash
+
+# Ensure the binary is on PATH (installer places it in ~/.local/bin)
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  export PATH="$HOME/.local/bin:$PATH"
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+fi
+
 info "claude installed → $(claude --version 2>/dev/null || echo 'run: claude')"
 
 section "Installing OpenAI Codex CLI"
