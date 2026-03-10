@@ -5,10 +5,8 @@
 # ============================================================
 
 set -eo pipefail
-set +x
 
 NVM_VERSION="v0.40.4"
-NODE_VERSION="24.0"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -34,6 +32,11 @@ export NVM_DIR="$HOME/.nvm"
 # shellcheck disable=SC1091
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 
+if ! command -v nvm &>/dev/null; then
+  echo -e "${RED}[✘] nvm failed to load — aborting${NC}"
+  exit 1
+fi
+
 # Ensure nvm is in shell config (idempotent)
 SHELL_RC=""
 if [ -f "$HOME/.zshrc" ]; then
@@ -50,9 +53,9 @@ fi
 # ── 2. Install Node.js (LTS) + npm ───────────────────────────
 section "Installing Node.js LTS + npm"
 
-nvm install "$NODE_VERSION"
-nvm use --lts "$NODE_VERSION"
-nvm alias default "$NODE_VERSION"
+nvm install --lts
+nvm use --lts
+nvm alias default lts/*
 
 info "Node $(node --version) / npm $(npm --version) active"
 
@@ -92,3 +95,5 @@ echo "    claude    — runs setup on first launch"
 echo "    codex     — set OPENAI_API_KEY env var"
 echo "    gemini    — runs setup on first launch"
 echo ""
+
+source ~/.bashrc
