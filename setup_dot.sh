@@ -16,6 +16,12 @@ cp .pythonstartup ~/
 # git
 cp .gitconfig ~/
 
+# Fix bracketed paste mode
+if ! grep -q 'set enable-bracketed-paste off' ~/.inputrc 2>/dev/null; then
+	echo 'set enable-bracketed-paste off' >> ~/.inputrc
+	echo "Added bracketed paste fix to ~/.inputrc"
+fi
+
 # install quickopen
 quickopen_dir="$HOME/quickopen"
 if  [ ! -d $quickopen_dir ]; then
