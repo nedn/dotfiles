@@ -15,7 +15,7 @@ info()    { echo -e "${GREEN}[✔]${NC} $1"; }
 warn()    { echo -e "${YELLOW}[!]${NC} $1"; }
 section() { echo -e "\n${YELLOW}──────────────────────────────────${NC}"; echo -e "  $1"; echo -e "${YELLOW}──────────────────────────────────${NC}"; }
 
-TOOLS=(git neovim rsync ripgrep)
+TOOLS=(git neovim rsync ripgrep byobu)
 
 # ── Update package index ─────────────────────────────────────
 section "Updating apt package index"
@@ -36,6 +36,19 @@ for tool in "${TOOLS[@]}"; do
   fi
 done
 
+# ── Install git-delta (from GitHub release) ─────────────────
+section "Installing git-delta"
+if command -v delta &>/dev/null; then
+  warn "git-delta is already installed — skipping"
+else
+  DELTA_VERSION="0.18.2"
+  DELTA_DEB="/tmp/git-delta.deb"
+  curl -sL "https://github.com/dandavison/delta/releases/latest/download/git-delta_${DELTA_VERSION}_amd64.deb" -o "$DELTA_DEB"
+  sudo dpkg -i "$DELTA_DEB"
+  rm -f "$DELTA_DEB"
+  info "git-delta installed"
+fi
+
 # ── Done ─────────────────────────────────────────────────────
 echo -e "\n${GREEN}╔══════════════════════════════════╗${NC}"
 echo -e "${GREEN}║   Essential tools installed! 🎉  ║${NC}"
@@ -45,4 +58,6 @@ echo "  git     → $(git --version 2>/dev/null)"
 echo "  nvim    → $(nvim --version 2>/dev/null | head -1)"
 echo "  rsync   → $(rsync --version 2>/dev/null | head -1)"
 echo "  rg      → $(rg --version 2>/dev/null | head -1)"
+echo "  byobu   → $(byobu --version 2>/dev/null | head -1)"
+echo "  delta   → $(delta --version 2>/dev/null | head -1)"
 echo ""
