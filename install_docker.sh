@@ -22,7 +22,7 @@ sudo apt remove -y docker docker-engine docker.io containerd runc >/dev/null 2>&
 
 echo
 echo "Step 2: Install prerequisites"
-sudo apt update
+sudo apt update || echo "Warning: apt update had errors (non-Docker repos); continuing…"
 sudo apt install -y ca-certificates curl gnupg lsb-release
 
 echo
@@ -46,7 +46,7 @@ https://download.docker.com/linux/ubuntu ${CODENAME} stable" \
 
 echo
 echo "Step 4: Install Docker Engine + Compose + Buildx"
-sudo apt update
+sudo apt update || echo "Warning: apt update had errors (non-Docker repos); continuing…"
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 echo
