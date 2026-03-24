@@ -41,9 +41,9 @@ section "Installing git-delta"
 if command -v delta &>/dev/null; then
   warn "git-delta is already installed — skipping"
 else
-  DELTA_VERSION="0.18.2"
+  DELTA_VERSION="$(curl -fSL -o /dev/null -w '%{url_effective}' https://github.com/dandavison/delta/releases/latest | grep -oP '[^/]+$')"
   DELTA_DEB="/tmp/git-delta.deb"
-  curl -sL "https://github.com/dandavison/delta/releases/latest/download/git-delta_${DELTA_VERSION}_amd64.deb" -o "$DELTA_DEB"
+  curl -fSL "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/git-delta_${DELTA_VERSION}_amd64.deb" -o "$DELTA_DEB"
   sudo dpkg -i "$DELTA_DEB"
   rm -f "$DELTA_DEB"
   info "git-delta installed"
