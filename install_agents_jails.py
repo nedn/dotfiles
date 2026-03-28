@@ -215,19 +215,22 @@ class AgentJailer(ABC):
 #
 # Config: ~/.claude/settings.json  (JSON)
 #
-# Claude Code restricts tools via permissions.deny patterns. It does NOT
-# support path-level filesystem restrictions in settings.json — filesystem
-# sandboxing must be done at the OS/container level.
+# Claude Code supports native sandbox configuration with path-level filesystem
+# restrictions via the "sandbox" key in settings.json.
 #
-# What we CAN do:
-#   - Deny network-accessing tools (WebSearch, WebFetch, curl, wget, etc.)
-#   - Deny shell commands that reach outside the working directory
-#   - Ensure permission prompts are enabled (remove skipDangerousModePermissionPrompt)
+# Filesystem jail:
+#   sandbox.enabled = true
+#   sandbox.filesystem.allowRead/denyRead — control read access
+#   sandbox.filesystem.allowWrite/denyWrite — control write access
+#   Reads and writes limited to cwd ("."), home directory reads denied.
+#
+# Network jail (--disable-internet):
+#   Deny network-accessing tools (WebSearch, WebFetch, curl, wget, etc.)
 #
 
 
 class ClaudeCodeJailer(AgentJailer):
-    """Jail Claude Code via ~/.claude/settings.json permissions deny-list."""
+    """Jail Claude Code via ~/.claude/settings.json sandbox configuration."""
 
     # Tools/patterns to deny for network restriction
     NETWORK_DENIALS = [
@@ -245,24 +248,6 @@ class ClaudeCodeJailer(AgentJailer):
         "Bash(wget *)",
         "WebFetch",
         "WebSearch",
-    ]
-
-    # Shell patterns to deny for filesystem restriction
-    FILESYSTEM_DENIALS = [
-        "Bash(cat /etc/*)",
-        "Bash(cat ~/*)",
-        "Bash(cp /* *)",
-        "Bash(cp ~/* *)",
-        "Bash(ls /etc/*)",
-        "Bash(ls ~/*)",
-        "Bash(mv /* *)",
-        "Bash(mv ~/* *)",
-        "Bash(rm -rf /*)",
-        "Bash(rm -rf ~/*)",
-        "Bash(rm /*)",
-        "Bash(rm ~/*)",
-        "Bash(rmdir /*)",
-        "Bash(rmdir ~/*)",
     ]
 
     @property
@@ -285,19 +270,25 @@ class ClaudeCodeJailer(AgentJailer):
     def build_jailed_config(self, existing: dict) -> dict:
         config = json.loads(json.dumps(existing))  # deep copy
 
-        config.setdefault("permissions", {})
-        deny = set(config["permissions"].get("deny", []))
+        # Apply native sandbox with filesystem restrictions
+        config["sandbox"] = {
+            "enabled": True,
+            "filesystem": {
+                "allowRead": ["."],
+                "denyRead": ["~/"],
+                "allowWrite": ["."],
+                "denyWrite": ["/"],
+            },
+        }
 
-        # Always apply filesystem restrictions
-        deny.update(self.FILESYSTEM_DENIALS)
-
-        # Network restrictions
+        # Network restrictions via permissions deny-list
         if self.disable_internet:
+            config.setdefault("permissions", {})
+            deny = set(config["permissions"].get("deny", []))
             deny.update(self.NETWORK_DENIALS)
+            config["permissions"]["deny"] = sorted(deny)
 
-        config["permissions"]["deny"] = sorted(deny)
-
-        # Enable autonomous mode — safe because the jail restricts what tools can do
+        # Enable autonomous mode — safe because the sandbox restricts what tools can do
         config["skipDangerousModePermissionPrompt"] = True
 
         return config
@@ -481,9 +472,9 @@ examples:
   %(prog)s codex --dry-run          # preview Codex changes without writing
 
 notes:
-  Claude Code does not support path-level filesystem restrictions in its
-  settings.json. The script denies dangerous shell patterns and recommends
-  running Claude Code inside a container for full filesystem sandboxing.
+  Claude Code supports native sandbox configuration with path-level
+  filesystem restrictions via the "sandbox" key in settings.json.
+  Reads and writes are limited to the current working directory.
 
   Codex CLI uses bubblewrap/Landlock (Linux) or Seatbelt (macOS) for
   filesystem sandboxing and a local proxy for network domain filtering.
