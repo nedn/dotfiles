@@ -14,9 +14,11 @@ For each agent:
   4. Shows unified diff of changes
 
 Usage:
-  python3 install_agent_jails.py                     # filesystem jail only
-  python3 install_agent_jails.py --disable-internet   # also restrict network
-  python3 install_agent_jails.py --dry-run            # preview without writing
+  python3 install_agent_jails.py                     # jail all agents
+  python3 install_agent_jails.py claude              # jail only Claude Code
+  python3 install_agent_jails.py claude codex        # jail Claude and Codex
+  python3 install_agent_jails.py --disable-internet  # also restrict network
+  python3 install_agent_jails.py --dry-run           # preview without writing
 """
 
 import argparse
@@ -460,9 +462,9 @@ class GeminiCLIJailer(AgentJailer):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 JAILERS = {
-    "claude-code": ClaudeCodeJailer,
-    "codex-cli": CodexCLIJailer,
-    "gemini-cli": GeminiCLIJailer,
+    "claude": ClaudeCodeJailer,
+    "codex": CodexCLIJailer,
+    "gemini": GeminiCLIJailer,
 }
 
 
@@ -472,10 +474,11 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
 examples:
-  %(prog)s                          # filesystem jail only
+  %(prog)s                          # jail all agents (default)
+  %(prog)s claude                   # jail only Claude Code
+  %(prog)s claude gemini            # jail Claude and Gemini
   %(prog)s --disable-internet       # also restrict network to LLM APIs
-  %(prog)s --dry-run                # preview changes without writing
-  %(prog)s --agents codex-cli       # jail only Codex CLI
+  %(prog)s codex --dry-run          # preview Codex changes without writing
 
 notes:
   Claude Code does not support path-level filesystem restrictions in its
@@ -499,13 +502,13 @@ notes:
         default="old_settings",
         help="directory for config backups (default: old_settings)",
     )
+    all_agents = list(JAILERS.keys())
     parser.add_argument(
-        "--agents",
-        nargs="+",
-        choices=list(JAILERS.keys()),
-        default=list(JAILERS.keys()),
+        "agents",
+        nargs="*",
+        default=None,
         metavar="AGENT",
-        help=f"which agents to jail (choices: {', '.join(JAILERS)}; default: all)",
+        help=f"agents to jail (choices: {', '.join(all_agents)}; default: all)",
     )
     parser.add_argument(
         "--dry-run",
@@ -513,6 +516,16 @@ notes:
         help="show what would change without writing any files",
     )
     args = parser.parse_args()
+
+    if not args.agents:
+        args.agents = all_agents
+    else:
+        invalid = [a for a in args.agents if a not in JAILERS]
+        if invalid:
+            parser.error(
+                f"invalid agent(s): {', '.join(invalid)} "
+                f"(choose from {', '.join(all_agents)})"
+            )
 
     backup_dir = Path(args.backup_dir)
 
