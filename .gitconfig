@@ -1,6 +1,7 @@
 [user]
   name = Ned
   email = 911877+nedn@users.noreply.github.com
+
 [alias]
   st = status
   ci = commit
@@ -11,20 +12,40 @@
   tree = log --graph --decorate --pretty=oneline --abbrev-commit
   sticky = config credential.helper 'cache --timeout=10800'
   sq = !git reset --soft $(git rev-list --reverse origin/main..HEAD | head -1) && git commit --amend
+
 [color]
   status = auto
   branch = auto
   ui = auto
   diff = auto
+
 [core]
   editor = vim
-  pager = delta
+
 [merge]
   tool = meld
   conflictStyle = zdiff3
+
 [branch]
   autosetuprebase = always
+
 [interactive]
   diffFilter = delta --color-only
+
 [delta]
   navigate = true
+
+[difftool]
+    # Run the difftool immediately, don't ask 'are you sure' each time.
+    prompt = false
+
+[pager]
+    # Use a pager if the difftool output is larger than one screenful,
+    # consistent with the behaviour of `git diff`.
+    difftool = true
+
+[diff]
+    external = difft
+    # Set difftastic as the default difftool, so we don't need to specify
+    # `-t difftastic` every time.
+    tool = difftastic
