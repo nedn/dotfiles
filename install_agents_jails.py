@@ -35,7 +35,13 @@ except ImportError:
     try:
         import tomli as tomllib  # type: ignore[no-redef]
     except ImportError:
-        tomllib = None  # type: ignore[assignment]
+        print(
+            "Error: No TOML parser available.\n"
+            "Either upgrade to Python 3.11+ (which includes tomllib) "
+            "or install tomli: pip install tomli",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
 
 # ─── TOML serializer ─────────────────────────────────────────────────────────
@@ -88,71 +94,6 @@ def _toml_collect(data: dict, lines: list[str], path: list[str]) -> None:
 
     for key, value in tables.items():
         _toml_collect(value, lines, path + [key])
-
-
-# ─── Basic TOML parser (fallback when tomllib unavailable) ────────────────────
-
-
-def _parse_toml_section_header(header: str) -> list[str]:
-    """Parse 'foo."bar.baz".qux' into ['foo', 'bar.baz', 'qux']."""
-    parts: list[str] = []
-    i = 0
-    while i < len(header):
-        if header[i] == '"':
-            j = header.index('"', i + 1)
-            parts.append(header[i + 1 : j])
-            i = j + 1
-            if i < len(header) and header[i] == ".":
-                i += 1
-        elif header[i] == ".":
-            i += 1
-        else:
-            j = header.find(".", i)
-            if j == -1:
-                j = len(header)
-            parts.append(header[i:j].strip())
-            i = j
-    return parts
-
-
-def _basic_toml_parse(text: str) -> dict:
-    """Minimal TOML parser for simple key=value and [section] configs."""
-    result: dict = {}
-    current = result
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        if stripped.startswith("[") and not stripped.startswith("[["):
-            section = stripped.strip("[] ")
-            parts = _parse_toml_section_header(section)
-            current = result
-            for part in parts:
-                current = current.setdefault(part, {})
-            continue
-        if "=" in stripped:
-            key, _, val = stripped.partition("=")
-            key = key.strip().strip('"')
-            val = val.strip()
-            if val.startswith('"') and val.endswith('"'):
-                val = val[1:-1]
-            elif val == "true":
-                val = True
-            elif val == "false":
-                val = False
-            elif val.startswith("["):
-                inner = val[1:-1]
-                val = [v.strip().strip('"') for v in inner.split(",") if v.strip()]
-            else:
-                try:
-                    val = int(val)
-                except ValueError:
-                    try:
-                        val = float(val)
-                    except ValueError:
-                        pass
-            current[key] = val
-    return result
 
 
 # ─── Deep merge utility ──────────────────────────────────────────────────────
@@ -400,13 +341,8 @@ class CodexCLIJailer(AgentJailer):
     def parse_config(self) -> dict:
         if not self.config_path.exists():
             return {}
-        if tomllib is not None:
-            try:
-                with open(self.config_path, "rb") as f:
-                    return tomllib.load(f)
-            except Exception:
-                print(f"  WARNING: tomllib failed on {self.config_path}, using fallback parser")
-        return _basic_toml_parse(self.config_path.read_text())
+        with open(self.config_path, "rb") as f:
+            return tomllib.load(f)
 
     def build_jailed_config(self, existing: dict) -> dict:
         config = json.loads(json.dumps(existing))  # deep copy
