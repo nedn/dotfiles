@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-install_agent_jails.py - Configure restricted/jailed mode for AI agent CLI tools.
+install_agents_jails.py - Configure restricted/jailed mode for AI agent CLI tools.
 
 Sets up filesystem and network restrictions for:
   - Claude Code  (~/.claude/settings.json)
@@ -14,11 +14,11 @@ For each agent:
   4. Shows unified diff of changes
 
 Usage:
-  python3 install_agent_jails.py                     # jail all agents
-  python3 install_agent_jails.py claude              # jail only Claude Code
-  python3 install_agent_jails.py claude codex        # jail Claude and Codex
-  python3 install_agent_jails.py --disable-internet  # also restrict network
-  python3 install_agent_jails.py --dry-run           # preview without writing
+  python3 install_agents_jails.py                     # jail all agents
+  python3 install_agents_jails.py claude              # jail only Claude Code
+  python3 install_agents_jails.py claude codex        # jail Claude and Codex
+  python3 install_agents_jails.py --disable-internet  # also restrict network
+  python3 install_agents_jails.py --dry-run           # preview without writing
 """
 
 import argparse
@@ -529,7 +529,7 @@ notes:
 
     backup_dir = Path(args.backup_dir)
 
-    print("install_agent_jails.py")
+    print("install_agents_jails.py")
     print(f"  disable-internet : {args.disable_internet}")
     print(f"  backup directory : {backup_dir.resolve()}")
     print(f"  agents           : {', '.join(args.agents)}")
