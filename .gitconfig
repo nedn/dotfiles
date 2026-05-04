@@ -3,6 +3,7 @@
   email = 911877+nedn@users.noreply.github.com
 
 [alias]
+  aliases = "!git config --get-regexp '^alias\\.' | sed 's/^alias\\.//' | sed 's/ / = /' | sort"
   st = status
   ci = commit
   br = branch -a
@@ -13,6 +14,11 @@
   sticky = config credential.helper 'cache --timeout=10800'
   sq = !git reset --soft $(git rev-list --reverse origin/main..HEAD | head -1) && git commit --amend
   new = "!f() { git checkout -b \"$1\" --track origin/main; }; f"
+  install-main-guard = "!f() { \
+    hook=\"$(git rev-parse --git-path hooks/pre-commit)\"; \
+    cat > \"$hook\" <<'EOF'\n#!/bin/sh\nbranch=$(git symbolic-ref --short HEAD 2>/dev/null)\nif [ \"$branch\" = \"main\" ] || [ \"$branch\" = \"master\" ]; then\n  echo \"Direct commits to $branch are blocked. Create a feature branch instead.\"\n  echo \"Use 'git commit --no-verify' to bypass.\"\n  exit 1\nfi\nEOF\n        chmod +x \"$hook\"; \
+    echo \"Installed pre-commit hook at $hook\"; \
+}; f"
 [color]
   status = auto
   branch = auto
