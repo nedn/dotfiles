@@ -19,6 +19,14 @@
     cat > \"$hook\" <<'EOF'\n#!/bin/sh\nbranch=$(git symbolic-ref --short HEAD 2>/dev/null)\nif [ \"$branch\" = \"main\" ] || [ \"$branch\" = \"master\" ]; then\n  echo \"Direct commits to $branch are blocked. Create a feature branch instead.\"\n  echo \"Use 'git commit --no-verify' to bypass.\"\n  exit 1\nfi\nEOF\n        chmod +x \"$hook\"; \
     echo \"Installed pre-commit hook at $hook\"; \
 }; f"
+  ned-private = "!f() { \
+    git config user.name 'Ned'; \
+    git config user.email '911877+nedn@users.noreply.github.com'; \
+    n=\"$(git config user.name)\"; \
+    e=\"$(git config user.email)\"; \
+    FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --env-filter \"export GIT_AUTHOR_NAME='$n'; export GIT_AUTHOR_EMAIL='$e'; export GIT_COMMITTER_NAME='$n'; export GIT_COMMITTER_EMAIL='$e'\" -- --all; \
+    echo \"Rewrote all commits to $n <$e>. Now run: git push --force-with-lease\"; \
+  }; f"
 [color]
   status = auto
   branch = auto
