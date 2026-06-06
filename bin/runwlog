@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+
+# run_and_log: run a command, stream its stdout/stderr to the terminal as
+# usual, and at the same time save a copy of everything to a log file.
+#
+# The intent is that for a command with lots of output you keep seeing the
+# output live, but also get a plain-text log you can later feed to an AI
+# agent for analysis.
+
+set -uo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: run_and_log [-o LOGFILE] [--] COMMAND [ARGS...]
+
+Run COMMAND, streaming its stdout/stderr to the terminal while also saving
+a combined copy of both to a log file. When COMMAND finishes, prints:
+
+  saved log file of the run in <name>.txt
+
+and exits with COMMAND's own exit status.
+
+Options:
+  -o LOGFILE   Write the log to LOGFILE instead of an auto-generated name.
+  -h, --help   Show this help text.
+
+Examples:
+  run_and_log ./build.sh --release
+  run_and_log -o build.txt make -j8
+
+Notes:
+  stdout and stderr are combined into a single stream (in output order) so
+  the log reads top-to-bottom the way an AI agent would expect.
+EOF
+}
+
+logfile=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -o)
+      [[ $# -ge 2 ]] || { printf 'Error: -o requires a LOGFILE argument\n' >&2; exit 2; }
+      logfile="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      printf 'Error: unknown option: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [[ $# -eq 0 ]]; then
+  printf 'Error: no command given\n\n' >&2
+  usage >&2
+  exit 2
+fi
+
+# Auto-generate a log file name from the command and a timestamp when one
+# was not provided, e.g. run_and_log-build.sh-20260606-103755.txt
+if [[ -z "$logfile" ]]; then
+  base="$(basename -- "$1")"
+  # Keep the name filesystem-friendly.
+  base="${base//[^A-Za-z0-9._-]/_}"
+  logfile="run_and_log-${base}-$(date +%Y%m%d-%H%M%S).txt"
+fi
+
+# Run the command. Combine stderr into stdout, stream to the terminal and
+# tee a copy to the log file. pipefail + PIPESTATUS let us recover the
+# command's real exit status rather than tee's.
+"$@" 2>&1 | tee -- "$logfile"
+status=${PIPESTATUS[0]}
+
+printf 'saved log file of the run in %s\n' "$logfile"
+exit "$status"

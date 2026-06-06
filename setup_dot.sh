@@ -43,3 +43,10 @@ if command -v nvim >/dev/null 2>&1; then
 	cp .vimrc "$nvim_config_dir/init.vim"
 	echo "Succesfully create init.vim config for neovim!"
 fi
+
+# Wire this repo's bin/ (run_and_log, etc.) onto PATH via ~/.bashrc
+repo_bin="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bin"
+if ! grep -q "$repo_bin" ~/.bashrc 2>/dev/null; then
+	echo "export PATH=\"$repo_bin:\$PATH\"" >> ~/.bashrc
+	echo "Added $repo_bin to PATH in ~/.bashrc"
+fi

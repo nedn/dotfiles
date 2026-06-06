@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ============================================================
 # AI Dev Tools Installer
-# Installs: nvm, Node/npm, Claude Code, Codex CLI, Gemini CLI
+# Installs: nvm, Node/npm, Claude Code, Codex CLI, Gemini CLI, OpenCode
 # ============================================================
 
 set -eo pipefail
@@ -80,6 +80,10 @@ section "Installing Gemini CLI"
 npm install -g @google/gemini-cli
 info "gemini installed → $(gemini --version 2>/dev/null || echo 'run: gemini')"
 
+section "Installing OpenCode"
+npm install -g opencode-ai
+info "opencode installed → $(opencode --version 2>/dev/null || echo 'run: opencode')"
+
 # ── Done ─────────────────────────────────────────────────────
 echo -e "\n${GREEN}╔══════════════════════════════════╗${NC}"
 echo -e "${GREEN}║   All tools installed! 🎉        ║${NC}"
@@ -88,12 +92,14 @@ echo ""
 echo "  claude    → Claude Code (Anthropic)"
 echo "  codex     → Codex CLI   (OpenAI)"
 echo "  gemini    → Gemini CLI  (Google)"
+echo "  opencode  → OpenCode    (OpenCode)"
 echo ""
 warn "Restart your terminal (or run: source ~/.bashrc / source ~/.zshrc)"
 warn "Then authenticate each tool:"
 echo "    claude    — runs setup on first launch"
 echo "    codex     — set OPENAI_API_KEY env var"
 echo "    gemini    — runs setup on first launch"
+echo "    opencode  — run opencode, then use /connect"
 echo ""
 
 source ~/.bashrc
