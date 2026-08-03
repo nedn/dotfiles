@@ -11,16 +11,17 @@ usage() {
   cat <<'EOF'
 Usage: ./install_diffstatic.sh [--force] [--help]
 
-Install the latest prebuilt difftastic binary for Linux by following the
-official release-based installation flow from:
-https://difftastic.wilfred.me.uk/installation.html
+Install difftastic:
+  - On macOS: installs via Homebrew (brew install difftastic)
+  - On Linux: installs the latest prebuilt binary from:
+    https://difftastic.wilfred.me.uk/installation.html
 
 Options:
-  --force   Reinstall even if the latest version is already installed
+  --force   Reinstall even if the latest version is already installed (Linux)
   --help    Show this help text
 
 Environment:
-  INSTALL_DIR  Destination directory for the difft binary
+  INSTALL_DIR  Destination directory for the difft binary on Linux
                (default: /usr/local/bin)
 EOF
 }
@@ -88,8 +89,17 @@ done
 
 trap cleanup EXIT
 
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  if ! command -v brew >/dev/null 2>&1; then
+    die "brew is required to install difftastic on macOS"
+  fi
+  info "Installing difftastic using Homebrew"
+  brew install difftastic
+  exit 0
+fi
+
 if [[ "$(uname -s)" != "Linux" ]]; then
-  die "this installer currently supports Linux only"
+  die "this installer currently supports Linux and macOS only"
 fi
 
 if ! command -v curl >/dev/null 2>&1; then

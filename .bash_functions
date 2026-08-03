@@ -19,6 +19,96 @@ extract () {
   fi
 }
 
+_canonical_path () {
+  local p="$1"
+
+  # Expand tilde (~ or ~/path or ~user/path)
+  if [[ "$p" == "~" ]]; then
+    p="$HOME"
+  elif [[ "$p" == "~/"* ]]; then
+    p="$HOME/${p#\~/}"
+  elif [[ "$p" =~ ^~[a-zA-Z0-9._-]+(/|$) ]]; then
+    local user_part="${p%%/*}"
+    local rest="${p#"$user_part"}"
+    local user_home
+    user_home="$(eval echo "$user_part" 2>/dev/null)"
+    if [ -n "$user_home" ]; then
+      p="${user_home}${rest}"
+    fi
+  fi
+
+  # Expand environment variables if any ($VAR or ${VAR})
+  if [[ "$p" =~ \$ ]]; then
+    p="$(eval echo "\"$p\"" 2>/dev/null)"
+  fi
+
+  # 1. Try realpath if available and succeeds
+  if command -v realpath >/dev/null 2>&1; then
+    local res
+    if res="$(realpath "$p" 2>/dev/null)" && [ -n "$res" ]; then
+      echo "$res"
+      return 0
+    fi
+  fi
+
+  # 2. Try python3 if available
+  if command -v python3 >/dev/null 2>&1; then
+    local res
+    if res="$(python3 -c "import os, sys; print(os.path.realpath(os.path.expanduser(sys.argv[1])))" "$p" 2>/dev/null)" && [ -n "$res" ]; then
+      echo "$res"
+      return 0
+    fi
+  fi
+
+  # 3. If directory exists, use cd -P & pwd -P
+  if [ -d "$p" ]; then
+    local res
+    if res="$(cd -P "$p" 2>/dev/null && pwd -P)" && [ -n "$res" ]; then
+      echo "$res"
+      return 0
+    fi
+  fi
+
+  # 4. If file exists, use cd -P on its dirname & pwd -P
+  if [ -e "$p" ]; then
+    local dir base res
+    dir="$(dirname "$p")"
+    base="$(basename "$p")"
+    if res="$(cd -P "$dir" 2>/dev/null && pwd -P)" && [ -n "$res" ]; then
+      echo "$res/$base"
+      return 0
+    fi
+  fi
+
+  # 5. Pure bash resolution for paths (including non-existent)
+  if [[ "$p" != /* ]]; then
+    p="$(pwd -P)/$p"
+  fi
+
+  # Normalize /./ and /../ and redundant slashes
+  local oIFS="$IFS"
+  IFS="/"
+  local -a parts=($p)
+  IFS="$oIFS"
+  local -a stack=()
+  for part in "${parts[@]}"; do
+    if [ -z "$part" ] || [ "$part" = "." ]; then
+      continue
+    elif [ "$part" = ".." ]; then
+      if [ ${#stack[@]} -gt 0 ]; then
+        unset "stack[$((${#stack[@]}-1))]"
+        stack=("${stack[@]}")
+      fi
+    else
+      stack+=("$part")
+    fi
+  done
+
+  local joined
+  joined="$(IFS=/; echo "${stack[*]}")"
+  echo "/$joined"
+}
+
 bash_export () {
   if [ -z "$1" ]; then
     echo "Usage: bash_export <path | export PATH=...>" >&2
@@ -53,12 +143,13 @@ bash_export () {
     return 1
   fi
 
-  # Convert leading ~/ to $HOME/
-  local file_path="$raw_path"
-  if [[ "$file_path" == "~/"* ]]; then
-    file_path="\$HOME/${file_path#\~/}"
-  elif [ "$file_path" = "~" ]; then
-    file_path="\$HOME"
+  # Expand to full canonical path
+  local canonical_path
+  canonical_path="$(_canonical_path "$raw_path")"
+
+  if [ -z "$canonical_path" ]; then
+    echo "Error: Could not resolve canonical path for '$raw_path'" >&2
+    return 1
   fi
 
   # Determine target export file (~/.bash_exports or ~/.bash_export)
@@ -73,14 +164,11 @@ bash_export () {
     fi
   fi
 
-  # Expand path for PATH checking
-  local expanded_path
-  expanded_path="$(eval echo "$file_path")"
-
   # Check if already present in export file
   local already_in_file=false
   if [ -f "$export_file" ]; then
-    if grep -Fq "$file_path" "$export_file" 2>/dev/null || grep -Fq "$raw_path" "$export_file" 2>/dev/null; then
+    if grep -Fq "$canonical_path" "$export_file" 2>/dev/null || \
+       grep -Fq "$raw_path" "$export_file" 2>/dev/null; then
       already_in_file=true
     fi
   fi
@@ -88,23 +176,23 @@ bash_export () {
   # Check if already present in current $PATH
   local already_in_path=false
   case ":$PATH:" in
-    *":$expanded_path:"*) already_in_path=true ;;
-    *":$raw_path:"*)      already_in_path=true ;;
+    *":$canonical_path:"* | *":$canonical_path/:"*) already_in_path=true ;;
+    *":$raw_path:"* | *":$raw_path/:"*)           already_in_path=true ;;
   esac
 
   if [ "$already_in_file" = true ]; then
-    echo "Path '$raw_path' is already exported in $export_file"
+    echo "Path '$canonical_path' is already exported in $export_file"
   else
     mkdir -p "$(dirname "$export_file")"
     if [ -s "$export_file" ] && [ -n "$(tail -c 1 "$export_file" 2>/dev/null)" ]; then
       echo "" >> "$export_file"
     fi
-    echo "export PATH=\"$file_path:\$PATH\"" >> "$export_file"
-    echo "Added 'export PATH=\"$file_path:\$PATH\"' to $export_file"
+    echo "export PATH=\"$canonical_path:\$PATH\"" >> "$export_file"
+    echo "Added 'export PATH=\"$canonical_path:\$PATH\"' to $export_file"
   fi
 
   # Update current shell PATH if not already present
   if [ "$already_in_path" = false ]; then
-    export PATH="$expanded_path:$PATH"
+    export PATH="$canonical_path:$PATH"
   fi
 }
