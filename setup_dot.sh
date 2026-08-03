@@ -7,6 +7,9 @@ cp .bash_profile ~/
 
 cp .bash_aliases ~/
 cp .bash_functions ~/
+if [ ! -f ~/.bash_exports ]; then
+	cp .bash_exports ~/
+fi
 source ~/.bashrc
 # vim config
 cp .vimrc ~/
