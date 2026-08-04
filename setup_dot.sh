@@ -19,11 +19,25 @@ cp .pythonstartup ~/
 # git
 cp .gitconfig ~/
 
-# Fix bracketed paste mode
-if ! grep -q 'set enable-bracketed-paste off' ~/.inputrc 2>/dev/null; then
-	echo 'set enable-bracketed-paste off' >> ~/.inputrc
-	echo "Added bracketed paste fix to ~/.inputrc"
-fi
+fix_terminal_paste() {
+	# Fix bracketed paste mode in inputrc
+	if ! grep -q 'set enable-bracketed-paste off' ~/.inputrc 2>/dev/null; then
+		echo 'set enable-bracketed-paste off' >> ~/.inputrc
+		echo "Added bracketed paste fix to ~/.inputrc"
+	fi
+
+	# Fix bracketed paste mode in zshrc for macOS and Linux
+	local os_type
+	os_type="$(uname -s)"
+	if [[ "$os_type" == "Darwin" || "$os_type" == "Linux" ]]; then
+		if ! grep -q 'unset zle_bracketed_paste' ~/.zshrc 2>/dev/null; then
+			echo "unset zle_bracketed_paste" >> ~/.zshrc
+			echo "Added bracketed paste fix to ~/.zshrc"
+		fi
+	fi
+}
+
+fix_terminal_paste
 
 # install quickopen
 quickopen_dir="$HOME/quickopen"
