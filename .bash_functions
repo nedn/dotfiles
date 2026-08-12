@@ -164,11 +164,15 @@ bash_export () {
     fi
   fi
 
-  # Check if already present in export file
+  # Check for the exact line this function writes. A substring search is not
+  # sufficient here: /opt/zig would otherwise match /opt/zig/zig-out/bin (or
+  # even a comment) and incorrectly be reported as already exported.
   local already_in_file=false
   if [ -f "$export_file" ]; then
-    if grep -Fq "$canonical_path" "$export_file" 2>/dev/null || \
-       grep -Fq "$raw_path" "$export_file" 2>/dev/null; then
+    local export_line="export PATH=\"$canonical_path:\$PATH\""
+    local raw_export_line="export PATH=\"$raw_path:\$PATH\""
+    if grep -Fxq "$export_line" "$export_file" 2>/dev/null || \
+       grep -Fxq "$raw_export_line" "$export_file" 2>/dev/null; then
       already_in_file=true
     fi
   fi
@@ -183,11 +187,20 @@ bash_export () {
   if [ "$already_in_file" = true ]; then
     echo "Path '$canonical_path' is already exported in $export_file"
   else
-    mkdir -p "$(dirname "$export_file")"
-    if [ -s "$export_file" ] && [ -n "$(tail -c 1 "$export_file" 2>/dev/null)" ]; then
-      echo "" >> "$export_file"
+    if ! mkdir -p "$(dirname "$export_file")"; then
+      echo "Error: Could not create directory for $export_file" >&2
+      return 1
     fi
-    echo "export PATH=\"$canonical_path:\$PATH\"" >> "$export_file"
+    if [ -s "$export_file" ] && [ -n "$(tail -c 1 "$export_file" 2>/dev/null)" ]; then
+      if ! printf '\n' >> "$export_file"; then
+        echo "Error: Could not write to $export_file" >&2
+        return 1
+      fi
+    fi
+    if ! printf 'export PATH="%s:$PATH"\n' "$canonical_path" >> "$export_file"; then
+      echo "Error: Could not write to $export_file" >&2
+      return 1
+    fi
     echo "Added 'export PATH=\"$canonical_path:\$PATH\"' to $export_file"
   fi
 
