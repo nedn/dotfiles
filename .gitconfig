@@ -14,6 +14,7 @@
   sticky = config credential.helper 'cache --timeout=10800'
   sq = !git reset --soft $(git rev-list --reverse origin/main..HEAD | head -1) && git commit --amend
   new = "!f() { git checkout -b \"$1\" --track origin/main; }; f"
+  nuke-branches = "!git branch | grep -v 'main' | xargs git branch -D"
   install-main-guard = "!f() { \
     hook=\"$(git rev-parse --git-path hooks/pre-commit)\"; \
     cat > \"$hook\" <<'EOF'\n#!/bin/sh\nbranch=$(git symbolic-ref --short HEAD 2>/dev/null)\nif [ \"$branch\" = \"main\" ] || [ \"$branch\" = \"master\" ]; then\n  echo \"Direct commits to $branch are blocked. Create a feature branch instead.\"\n  echo \"Use 'git commit --no-verify' to bypass.\"\n  exit 1\nfi\nEOF\n        chmod +x \"$hook\"; \
