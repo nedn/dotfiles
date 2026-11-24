@@ -1,32 +1,65 @@
 This repo is used to store my configuration files on Linux (and macOS).
 
-Dotfiles are managed with chezmoi (https://www.chezmoi.io/).
+Dotfiles *and* the tools they depend on are managed with chezmoi
+(https://www.chezmoi.io/): one `chezmoi apply` sets up a whole machine.
 
 Layout
 ------
   .chezmoiroot          tells chezmoi the source state lives in home/
   home/                 chezmoi source state (mirrors $HOME)
+    .chezmoi.toml.tmpl    per-machine config; asks once which optional
+                          components to install (AI agents, Docker, Tailscale)
+    .chezmoidata/packages.yaml
+                          package lists (apt, brew, uv tools, npm globals)
+    .chezmoiexternal.toml.tmpl
+                          single-binary tools from GitHub releases into
+                          ~/.local/bin: lazygit, delta, difft, uv/uvx
+    .chezmoiscripts/      install scripts, re-run when their inputs change:
+      run_onchange_before_10-install-system-packages   apt / brew
+      run_onchange_after_20-install-uv-tools           mdformat, ...
+      run_onchange_after_30-install-ai-agents          nvm+node, claude, codex, gemini, opencode
+      run_onchange_after_40-install-docker             if docker = true (Linux)
+      run_onchange_after_50-install-tailscale          if tailscale = true
+      run_onchange_after_fix-terminal-paste            bracketed-paste fix
     dot_bashrc            -> ~/.bashrc  (dot_ = leading ".")
     create_dot_bash_exports -> ~/.bash_exports, only created if missing
                              (put machine-local exports/secrets here)
     modify_dot_gitconfig.tmpl -> ~/.gitconfig, merged via update_gitconfig.py
                              so the machine's [user]/[credential] sections stay
-    dot_config/nvim/      -> ~/.config/nvim/init.vim (= .vimrc; only if nvim exists)
+    dot_config/nvim/      -> ~/.config/nvim/init.vim (= .vimrc)
     dot_config/kitty/     -> ~/.config/kitty/kitty.conf (only if kitty exists)
     dot_local/bin/        -> ~/.local/bin (runwlog, ...)
-    .chezmoiscripts/      one-off setup scripts (bracketed-paste fix)
   .gitconfig            base git config consumed by update_gitconfig.py
-  install_*.sh, etc.    standalone tool installers, not managed by chezmoi
+  install_agents_jails.py  optional, run by hand: sandbox AI agent configs
 
-First-time setup
-----------------
-  git clone <this repo> ~/projects/dotfiles
+First-time setup on a new machine
+---------------------------------
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin init --apply nedn/dotfiles
+
+or, from an existing clone:
+
+  git clone https://github.com/nedn/dotfiles ~/projects/dotfiles
   ~/projects/dotfiles/setup_dot.sh     # installs chezmoi if needed, then applies
+
+chezmoi asks which optional components this machine wants; answers are saved
+in ~/.config/chezmoi/chezmoi.toml. Change them later with
+`chezmoi init --prompt && chezmoi apply`.
+
+Set GITHUB_TOKEN to avoid GitHub API rate limits when resolving the latest
+releases in .chezmoiexternal.toml.tmpl.
+
+Adding a tool
+-------------
+  apt/brew/uv/npm package   add it to home/.chezmoidata/packages.yaml
+  GitHub release binary     add an entry to home/.chezmoiexternal.toml.tmpl
+  anything else             add a run_onchange_ script to home/.chezmoiscripts/
+Then `chezmoi apply` on each machine (after `git pull`, or `chezmoi update`).
 
 Day to day
 ----------
+  chezmoi update               # git pull + apply
   chezmoi diff                 # preview what would change in $HOME
-  chezmoi apply                # apply the repo to $HOME
+  chezmoi apply                # apply the repo to $HOME (and install tools)
   chezmoi edit --apply ~/.bashrc
   chezmoi re-add ~/.bashrc     # pull edits made directly in $HOME back into the repo
   chezmoi cd                   # open a shell in this repo

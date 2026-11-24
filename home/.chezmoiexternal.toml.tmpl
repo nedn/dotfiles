@@ -1,0 +1,44 @@
+{{- /*
+  Single-binary tools downloaded from their latest GitHub release into
+  ~/.local/bin (no sudo needed, same on Linux and macOS). chezmoi re-downloads
+  when a new release appears; set GITHUB_TOKEN to avoid API rate limits.
+*/ -}}
+{{- $os := .chezmoi.os -}}
+{{- $cpu := eq .chezmoi.arch "arm64" | ternary "aarch64" "x86_64" -}}
+{{- $triple := eq $os "darwin" | ternary (printf "%s-apple-darwin" $cpu) (printf "%s-unknown-linux-gnu" $cpu) -}}
+{{- $lazygitArch := eq .chezmoi.arch "arm64" | ternary "arm64" "x86_64" -}}
+
+[".local/bin/lazygit"]
+  type = "archive-file"
+  url = {{ gitHubLatestReleaseAssetURL "jesseduffield/lazygit" (printf "lazygit_*_%s_%s.tar.gz" $os $lazygitArch) | quote }}
+  path = "lazygit"
+  executable = true
+
+[".local/bin/delta"]
+  type = "archive-file"
+  url = {{ gitHubLatestReleaseAssetURL "dandavison/delta" (printf "delta-*-%s.tar.gz" $triple) | quote }}
+  stripComponents = 1
+  path = "delta"
+  executable = true
+
+[".local/bin/difft"]
+  type = "archive-file"
+  url = {{ gitHubLatestReleaseAssetURL "Wilfred/difftastic" (printf "difft-*-%s.tar.gz" $triple) | quote }}
+  path = "difft"
+  executable = true
+
+{{- $uvURL := gitHubLatestReleaseAssetURL "astral-sh/uv" (printf "uv-%s.tar.gz" $triple) }}
+
+[".local/bin/uv"]
+  type = "archive-file"
+  url = {{ $uvURL | quote }}
+  stripComponents = 1
+  path = "uv"
+  executable = true
+
+[".local/bin/uvx"]
+  type = "archive-file"
+  url = {{ $uvURL | quote }}
+  stripComponents = 1
+  path = "uvx"
+  executable = true

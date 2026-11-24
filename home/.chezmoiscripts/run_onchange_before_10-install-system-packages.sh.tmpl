@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Installs system packages from .chezmoidata/packages.yaml.
+# Re-runs whenever the package list changes:
+# apt:  {{ .packages.apt | join " " }}
+# brew: {{ .packages.brew | join " " }}
+set -euo pipefail
+
+{{ if eq .chezmoi.os "linux" -}}
+if ! command -v apt-get >/dev/null 2>&1; then
+  echo "[!] apt-get not found; skipping system packages (only Debian/Ubuntu supported)." >&2
+  exit 0
+fi
+
+SUDO=""
+if [ "$(id -u)" -ne 0 ]; then
+  if ! command -v sudo >/dev/null 2>&1; then
+    echo "[!] Not root and no sudo; skipping system packages." >&2
+    exit 0
+  fi
+  SUDO=sudo
+fi
+
+missing=()
+for pkg in {{ .packages.apt | join " " }}; do
+  dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "install ok installed" || missing+=("$pkg")
+done
+
+if [ ${#missing[@]} -eq 0 ]; then
+  echo "[*] System packages already installed."
+  exit 0
+fi
+
+echo "[*] Installing apt packages: ${missing[*]}"
+# Don't fail on unrelated broken third-party repos.
+$SUDO apt-get update -y || echo "[!] apt-get update had errors; continuing." >&2
+$SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+
+{{- else if eq .chezmoi.os "darwin" }}
+if ! command -v brew >/dev/null 2>&1; then
+  for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    [ -x "$b" ] && eval "$("$b" shellenv)" && break
+  done
+fi
+if ! command -v brew >/dev/null 2>&1; then
+  echo "[*] Installing Homebrew"
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    [ -x "$b" ] && eval "$("$b" shellenv)" && break
+  done
+fi
+
+echo "[*] Installing brew packages"
+brew install {{ .packages.brew | join " " }}
+{{- end }}

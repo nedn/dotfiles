@@ -1,0 +1,36 @@
+{{- if index . "aiAgents" -}}
+#!/usr/bin/env bash
+# Installs nvm + Node LTS, Claude Code and the npm-based agent CLIs.
+# Enabled by the `aiAgents` answer in ~/.config/chezmoi/chezmoi.toml.
+# Re-runs whenever the npm list changes: {{ .packages.npm | join " " }}
+set -eo pipefail
+
+NVM_VERSION="v0.40.4"
+export NVM_DIR="$HOME/.nvm"
+
+if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+  echo "[*] Installing nvm ${NVM_VERSION}"
+  # PROFILE=/dev/null: don't let the installer edit ~/.bashrc (managed by
+  # chezmoi, which already loads nvm).
+  curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | PROFILE=/dev/null bash
+fi
+# shellcheck disable=SC1091
+. "$NVM_DIR/nvm.sh"
+
+if ! nvm which default >/dev/null 2>&1; then
+  echo "[*] Installing Node.js LTS"
+  nvm install --lts
+  nvm alias default 'lts/*'
+fi
+nvm use default >/dev/null
+
+echo "[*] Installing npm globals: {{ .packages.npm | join " " }}"
+npm install -g {{ range .packages.npm }}{{ . | quote }} {{ end }}
+
+if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
+  echo "[*] Installing Claude Code"
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
+
+echo "[*] AI agents ready. Authenticate on first run: claude, codex (OPENAI_API_KEY), gemini, opencode (/connect)."
+{{- end }}

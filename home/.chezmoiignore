@@ -1,7 +1,5 @@
-# Only deploy app configs when the app is installed.
-{{ if not (lookPath "nvim") }}
-.config/nvim
-{{ end }}
+# Only deploy app configs when the app is installed. (nvim is always installed
+# by .chezmoiscripts, so its config is deployed unconditionally.)
 {{ if not (lookPath "kitty") }}
 .config/kitty
 {{ end }}

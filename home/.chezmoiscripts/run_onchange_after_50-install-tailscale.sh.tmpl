@@ -1,0 +1,25 @@
+{{- if index . "tailscale" -}}
+#!/usr/bin/env bash
+# Installs Tailscale. Enabled by the `tailscale` answer in
+# ~/.config/chezmoi/chezmoi.toml. Joining the tailnet needs a browser login,
+# so it's left to you: `sudo tailscale up [--ssh]`.
+set -euo pipefail
+
+if command -v tailscale >/dev/null 2>&1; then
+  echo "[*] Tailscale already installed."
+  exit 0
+fi
+
+{{ if eq .chezmoi.os "darwin" -}}
+brew install --cask tailscale
+{{- else -}}
+echo "[*] Installing Tailscale"
+# Let apt-get update continue past unrelated broken third-party repos.
+curl -fsSL https://tailscale.com/install.sh \
+  | sed 's/apt-get update$/apt-get update || true/g' \
+  | sudo sh
+sudo systemctl enable --now tailscaled
+{{- end }}
+
+echo "[*] Tailscale installed. Join your tailnet with: sudo tailscale up   (add --ssh for Tailscale SSH)"
+{{- end }}

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Installs Python CLI tools with uv (uv itself comes from .chezmoiexternal).
+# Re-runs whenever the list changes:
+{{- range .packages.uvTools }}
+# - {{ . }}
+{{- end }}
+set -euo pipefail
+
+UV="$HOME/.local/bin/uv"
+command -v uv >/dev/null 2>&1 && UV="$(command -v uv)"
+if [ ! -x "$UV" ]; then
+  echo "[!] uv not found; skipping uv tools." >&2
+  exit 0
+fi
+
+{{ range .packages.uvTools -}}
+echo "[*] uv tool install {{ . }}"
+"$UV" tool install --upgrade {{ . }}
+{{ end -}}

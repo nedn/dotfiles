@@ -37,6 +37,58 @@ augroup END
 
 "}}}
 
+"{{{ Markdown auto-format on save
+" Pipes the buffer through an external formatter before writing. Uses
+" g:markdown_formatter if set, else the first of prettier / mdformat found on
+" $PATH. Does nothing if no formatter is installed. Disable per session with
+" `let g:markdown_format_on_save = 0`.
+function! s:MarkdownFormatter()
+  if exists('g:markdown_formatter')
+    return g:markdown_formatter
+  elseif executable('prettier')
+    return 'prettier --parser markdown --prose-wrap preserve'
+  elseif executable('mdformat')
+    return 'mdformat -'
+  endif
+  return ''
+endfunction
+
+function! s:FormatMarkdown()
+  if !get(g:, 'markdown_format_on_save', 1) || &bin
+    return
+  endif
+  let l:cmd = s:MarkdownFormatter()
+  if empty(l:cmd)
+    return
+  endif
+  let l:input = getline(1, '$')
+  " Keep stderr out of the buffer; systemlist() would otherwise merge it in.
+  let l:errfile = tempname()
+  let l:output = systemlist(l:cmd . ' 2>' . shellescape(l:errfile), l:input)
+  let l:err = filereadable(l:errfile) ? readfile(l:errfile) : []
+  call delete(l:errfile)
+  if v:shell_error
+    echohl WarningMsg
+    echomsg 'Markdown format failed (' . l:cmd . '): ' . join(l:err, ' ')
+    echohl None
+    return
+  endif
+  if l:output ==# l:input
+    return
+  endif
+  let l:view = winsaveview()
+  silent! undojoin
+  silent keepjumps %delete _
+  call setline(1, l:output)
+  call winrestview(l:view)
+endfunction
+
+augroup MarkdownFormatOnSave
+  autocmd!
+  autocmd BufWritePre *.md,*.markdown call s:FormatMarkdown()
+augroup END
+"}}}
+
 "{{{Misc Settings
 
 " Necesary  for lots of cool vim things

@@ -1,0 +1,32 @@
+# Tools every machine gets. Editing this file re-runs the install scripts in
+# .chezmoiscripts/ on the next `chezmoi apply`.
+#
+# Single-binary tools fetched from GitHub releases (lazygit, delta,
+# difftastic, uv) live in .chezmoiexternal.toml.tmpl instead.
+packages:
+  # Debian/Ubuntu (apt-get)
+  apt:
+    - byobu
+    - ca-certificates
+    - curl
+    - git
+    - neovim
+    - python3
+    - ripgrep
+    - rsync
+  # macOS (Homebrew)
+  brew:
+    - byobu
+    - git
+    - neovim
+    - python3
+    - ripgrep
+    - rsync
+  # `uv tool install` args, one tool per entry.
+  uvTools:
+    - mdformat --with mdformat-gfm   # markdown formatter used by vimrc on save
+  # Global npm packages, installed only when `aiAgents` is enabled.
+  npm:
+    - "@openai/codex"
+    - "@google/gemini-cli"
+    - opencode-ai
