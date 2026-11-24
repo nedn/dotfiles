@@ -1,69 +1,19 @@
-set -o xtrace 
+#!/usr/bin/env bash
+# Bootstrap dotfiles with chezmoi (https://www.chezmoi.io/).
+#
+# Installs chezmoi into ~/.local/bin if missing, points it at this repo and
+# applies the dotfiles. Re-running is safe. After the first run, use chezmoi
+# directly: `chezmoi diff`, `chezmoi apply`, `chezmoi edit ~/.bashrc`, ...
+set -euo pipefail
 
-# bash config
-cp .bashrc ~/
-# Mac uses this instead of .bashrc
-cp .bash_profile ~/
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-cp .bash_aliases ~/
-cp .bash_functions ~/
-if [ ! -f ~/.bash_exports ]; then
-	cp .bash_exports ~/
-fi
-source ~/.bashrc
-# vim config
-cp .vimrc ~/
-cp -r .vim ~/
-# python start up
-cp .pythonstartup ~/
-# git
-cp .gitconfig ~/
-
-fix_terminal_paste() {
-	# Fix bracketed paste mode in inputrc
-	if ! grep -q 'set enable-bracketed-paste off' ~/.inputrc 2>/dev/null; then
-		echo 'set enable-bracketed-paste off' >> ~/.inputrc
-		echo "Added bracketed paste fix to ~/.inputrc"
+if ! command -v chezmoi >/dev/null 2>&1; then
+	if [ ! -x "$HOME/.local/bin/chezmoi" ]; then
+		echo "Installing chezmoi into ~/.local/bin ..."
+		sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 	fi
-
-	# Fix bracketed paste mode in zshrc for macOS and Linux
-	local os_type
-	os_type="$(uname -s)"
-	if [[ "$os_type" == "Darwin" || "$os_type" == "Linux" ]]; then
-		if ! grep -q 'unset zle_bracketed_paste' ~/.zshrc 2>/dev/null; then
-			echo "unset zle_bracketed_paste" >> ~/.zshrc
-			echo "Added bracketed paste fix to ~/.zshrc"
-		fi
-	fi
-}
-
-fix_terminal_paste
-
-# install quickopen
-quickopen_dir="$HOME/quickopen"
-if  [ ! -d $quickopen_dir ]; then
-	echo "quickopen does not exist. Installing.."
-	cd ~/
-	git clone https://github.com/natduca/quickopen
-	cd quickopen
-	git submodule update --init --recursive
+	export PATH="$HOME/.local/bin:$PATH"
 fi
 
-kitty_config_dir='~/.config/kitty'
-if [ -d "$kitty_config_dir" ]; then
-  cp kitty.conf $kitty_config_dir
-fi
-
-if command -v nvim >/dev/null 2>&1; then
-	nvim_config_dir="$HOME/.config/nvim"
-	mkdir -p "$nvim_config_dir"
-	cp .vimrc "$nvim_config_dir/init.vim"
-	echo "Succesfully create init.vim config for neovim!"
-fi
-
-# Wire this repo's bin/ (run_and_log, etc.) onto PATH via ~/.bashrc
-repo_bin="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bin"
-if ! grep -q "$repo_bin" ~/.bashrc 2>/dev/null; then
-	echo "export PATH=\"$repo_bin:\$PATH\"" >> ~/.bashrc
-	echo "Added $repo_bin to PATH in ~/.bashrc"
-fi
+chezmoi init --source "$repo_dir" --apply "$@"

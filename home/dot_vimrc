@@ -377,6 +377,4 @@ endfunction
 " Start the find and replace command across the entire file
 vmap <Leader>r :<Del><Del><Del><Del><Del>%s/<c-r>=GetVisual()<cr>//g<Left><Left>
 
-source ~/quickopen/plugin/quickopen.vim
-
 autocmd FileType python setlocal shiftwidth=2 tabstop=2

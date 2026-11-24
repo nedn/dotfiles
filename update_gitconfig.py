@@ -18,6 +18,11 @@ when GitHub rejects a push with "GH007: Your push would publish a private email
 address". After running it, force-push with `git push --force-with-lease`.
 
 Before modifying ~/.gitconfig, a backup is created at ~/.gitconfig.backup.
+
+With --stdin, the current global config is read from stdin and the merged
+result is written to stdout (no backup, no file writes). chezmoi uses this mode
+via home/modify_dot_gitconfig.tmpl, so `chezmoi apply` keeps ~/.gitconfig in
+sync without clobbering machine-specific sections.
 """
 
 import os
@@ -49,30 +54,33 @@ def normalize_header(header):
         return f"{parts[0].lower()} {parts[1]}"
     return parts[0].lower()
 
+def parse_config_lines(lines):
+    """Parses gitconfig lines into a list of ConfigSection objects."""
+    sections = []
+    current_header = ""
+    current_lines = []
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('[') and stripped.endswith(']'):
+            if current_header or current_lines:
+                sections.append(ConfigSection(current_header, current_lines))
+            current_header = stripped
+            current_lines = []
+        else:
+            current_lines.append(line)
+
+    if current_header or current_lines:
+        sections.append(ConfigSection(current_header, current_lines))
+
+    return sections
+
 def parse_config(filepath):
     """Parses a gitconfig file into a list of ConfigSection objects."""
     if not os.path.exists(filepath):
         return []
-    
-    sections = []
-    current_header = ""
-    current_lines = []
-    
     with open(filepath, 'r', encoding='utf-8') as f:
-        for line in f:
-            stripped = line.strip()
-            if stripped.startswith('[') and stripped.endswith(']'):
-                if current_header or current_lines:
-                    sections.append(ConfigSection(current_header, current_lines))
-                current_header = stripped
-                current_lines = []
-            else:
-                current_lines.append(line)
-                
-    if current_header or current_lines:
-        sections.append(ConfigSection(current_header, current_lines))
-        
-    return sections
+        return parse_config_lines(f.readlines())
 
 def extract_user_identity(sections):
     """Returns (name, email) from the [user] section of the given sections."""
@@ -213,31 +221,52 @@ def merge_configs(local_sections, global_sections):
             
     return merged_sections
 
-def main():
-    home_dir = os.path.expanduser("~")
-    global_config_path = os.path.join(home_dir, ".gitconfig")
-    
-    # Determine local config path relative to script directory
+def render(sections):
+    """Serializes ConfigSection objects back into gitconfig text."""
+    out = []
+    for section in sections:
+        if section.header:
+            out.append(section.header + '\n')
+        out.extend(section.lines)
+    return ''.join(out)
+
+
+def load_local_sections():
+    """Parses this repo's .gitconfig and injects the generated alias."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     local_config_path = os.path.join(script_dir, ".gitconfig")
-    
     if not os.path.exists(local_config_path):
         print(f"Error: Local .gitconfig not found at {local_config_path}", file=sys.stderr)
         sys.exit(1)
-        
-    print(f"Reading local config from: {local_config_path}")
-    local_sections = parse_config(local_config_path)
+    sections = parse_config(local_config_path)
+    name, email = extract_user_identity(sections)
+    inject_alias(sections, name, email)
+    return local_config_path, sections, name, email
 
-    # Generate the `git ned-private` alias from this repo's [user] identity.
-    identity_name, identity_email = extract_user_identity(local_sections)
-    inject_alias(local_sections, identity_name, identity_email)
+
+def main_stdin():
+    """chezmoi modify_ mode: current config on stdin, merged config on stdout."""
+    _, local_sections, _, _ = load_local_sections()
+    global_sections = parse_config_lines(sys.stdin.read().splitlines(keepends=True))
+    sys.stdout.write(render(merge_configs(local_sections, global_sections)))
+
+
+def main():
+    if '--stdin' in sys.argv[1:]:
+        main_stdin()
+        return
+
+    global_config_path = os.path.join(os.path.expanduser("~"), ".gitconfig")
+
+    local_config_path, local_sections, identity_name, identity_email = load_local_sections()
+    print(f"Read local config from: {local_config_path}")
     if identity_name and identity_email:
         print(f"Configured '{ALIAS_NAME}' alias for identity: "
               f"{identity_name} <{identity_email}>")
 
     print(f"Reading global config from: {global_config_path}")
     global_sections = parse_config(global_config_path)
-    
+
     # Back up global ~/.gitconfig if it exists
     if os.path.exists(global_config_path):
         backup_path = f"{global_config_path}.backup"
@@ -249,20 +278,14 @@ def main():
             sys.exit(1)
     else:
         print("No existing global ~/.gitconfig to back up.")
-        
-    # Merge configs
+
     print("Merging configuration files...")
-    merged_sections = merge_configs(local_sections, global_sections)
-    
-    # Write the merged config back
+    merged = render(merge_configs(local_sections, global_sections))
+
     print(f"Writing merged configuration to: {global_config_path}")
     try:
         with open(global_config_path, 'w', encoding='utf-8') as f:
-            for section in merged_sections:
-                if section.header:
-                    f.write(section.header + '\n')
-                for line in section.lines:
-                    f.write(line)
+            f.write(merged)
         print("Successfully updated global ~/.gitconfig!")
     except Exception as e:
         print(f"Error: Failed to write to {global_config_path}: {e}", file=sys.stderr)

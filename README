@@ -1,1 +1,32 @@
-This repo is used to store my configuration files on Linux.
+This repo is used to store my configuration files on Linux (and macOS).
+
+Dotfiles are managed with chezmoi (https://www.chezmoi.io/).
+
+Layout
+------
+  .chezmoiroot          tells chezmoi the source state lives in home/
+  home/                 chezmoi source state (mirrors $HOME)
+    dot_bashrc            -> ~/.bashrc  (dot_ = leading ".")
+    create_dot_bash_exports -> ~/.bash_exports, only created if missing
+                             (put machine-local exports/secrets here)
+    modify_dot_gitconfig.tmpl -> ~/.gitconfig, merged via update_gitconfig.py
+                             so the machine's [user]/[credential] sections stay
+    dot_config/nvim/      -> ~/.config/nvim/init.vim (= .vimrc; only if nvim exists)
+    dot_config/kitty/     -> ~/.config/kitty/kitty.conf (only if kitty exists)
+    dot_local/bin/        -> ~/.local/bin (runwlog, ...)
+    .chezmoiscripts/      one-off setup scripts (bracketed-paste fix)
+  .gitconfig            base git config consumed by update_gitconfig.py
+  install_*.sh, etc.    standalone tool installers, not managed by chezmoi
+
+First-time setup
+----------------
+  git clone <this repo> ~/projects/dotfiles
+  ~/projects/dotfiles/setup_dot.sh     # installs chezmoi if needed, then applies
+
+Day to day
+----------
+  chezmoi diff                 # preview what would change in $HOME
+  chezmoi apply                # apply the repo to $HOME
+  chezmoi edit --apply ~/.bashrc
+  chezmoi re-add ~/.bashrc     # pull edits made directly in $HOME back into the repo
+  chezmoi cd                   # open a shell in this repo

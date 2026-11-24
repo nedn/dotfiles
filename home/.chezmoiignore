@@ -1,0 +1,7 @@
+# Only deploy app configs when the app is installed.
+{{ if not (lookPath "nvim") }}
+.config/nvim
+{{ end }}
+{{ if not (lookPath "kitty") }}
+.config/kitty
+{{ end }}

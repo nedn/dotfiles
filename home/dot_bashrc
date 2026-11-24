@@ -130,10 +130,13 @@ set -o noclobber
 # prevent accidental logging out
 set -o ignoreeof
 
-# add z - a better file navigator
-. ~/dotfiles/z/z.sh
-
 # a collection of bash_functions
 . ~/.bash_functions
 
 PATH=$PATH:~/go/bin
+
+# personal scripts managed by chezmoi (runwlog, etc.)
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) PATH="$HOME/.local/bin:$PATH" ;;
+esac

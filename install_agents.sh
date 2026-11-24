@@ -37,12 +37,13 @@ if ! command -v nvm &>/dev/null; then
   exit 1
 fi
 
-# Ensure nvm is in shell config (idempotent)
+# Ensure nvm is in shell config (idempotent). ~/.bashrc is managed by chezmoi,
+# so machine-local additions go in ~/.bash_exports (sourced by ~/.bashrc).
 SHELL_RC=""
 if [ -f "$HOME/.zshrc" ]; then
   SHELL_RC="$HOME/.zshrc"
-elif [ -f "$HOME/.bashrc" ]; then
-  SHELL_RC="$HOME/.bashrc"
+else
+  SHELL_RC="$HOME/.bash_exports"
 fi
 
 if [ -n "$SHELL_RC" ]; then
@@ -67,7 +68,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 # Ensure the binary is on PATH (installer places it in ~/.local/bin)
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
   export PATH="$HOME/.local/bin:$PATH"
-  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bash_exports
 fi
 
 info "claude installed → $(claude --version 2>/dev/null || echo 'run: claude')"

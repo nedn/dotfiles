@@ -1,0 +1,5 @@
+#!/bin/sh
+# chezmoi modify_ script for ~/.gitconfig.
+# Merges the repo's .gitconfig into the existing ~/.gitconfig while preserving
+# machine-specific [user], [credential*] and other global-only sections.
+exec python3 {{ joinPath .chezmoi.workingTree "update_gitconfig.py" | quote }} --stdin
